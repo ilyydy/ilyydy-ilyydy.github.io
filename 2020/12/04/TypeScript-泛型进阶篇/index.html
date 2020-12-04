@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic|Arial:300,300italic,400,400italic,700,700italic|Noto+Serif+SC:300,300italic,400,400italic,700,700italic|PingFang+SC:300,300italic,400,400italic,700,700italic|Microsoft+YaHei:300,300italic,400,400italic,700,700italic|sans-serif:300,300italic,400,400italic,700,700italic|Cascadia+Code:300,300italic,400,400italic,700,700italic|consolas:300,300italic,400,400italic,700,700italic|Menlo:300,300italic,400,400italic,700,700italic|monospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilyydy.github.io","root":"/","scheme":"Gemini","version":"8.0.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+
+  <meta name="description" content="介绍 TypeScript 泛型的进阶应用，核心是递归类型 Github Repo 地址：https:&#x2F;&#x2F;github.com&#x2F;ilyydy&#x2F;typescript-generic">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TypeScript 泛型进阶篇">
+<meta property="og:url" content="https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="介绍 TypeScript 泛型的进阶应用，核心是递归类型 Github Repo 地址：https:&#x2F;&#x2F;github.com&#x2F;ilyydy&#x2F;typescript-generic">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-12-04T01:15:01.000Z">
+<meta property="article:modified_time" content="2020-12-04T01:15:01.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="TypeScript">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/">
+
+
+<script data-pjax class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>TypeScript 泛型进阶篇 | 野草</title>
+  
+    <script>
+      function sendPageView() {
+        if (CONFIG.hostname !== location.hostname) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'G-7EVCK1VXFK',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">野草</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98%E5%87%BA%E5%8F%91"><span class="nav-number">1.</span> <span class="nav-text">从一个问题出发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E1%E5%88%B0%E5%A4%8D%E6%9D%82"><span class="nav-number">2.</span> <span class="nav-text">从1到复杂</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E7%AC%AC%E4%B8%80%E5%B1%82%E5%B1%9E%E6%80%A7%E5%80%BC"><span class="nav-number">2.1.</span> <span class="nav-text">获取第一层属性值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E6%AD%A4%E5%9F%BA%E7%A1%80%E4%B8%8A%E5%B0%9D%E8%AF%95%E6%89%A9%E5%B1%95"><span class="nav-number">2.2.</span> <span class="nav-text">在此基础上尝试扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E9%BB%98%E8%AE%A4%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">2.3.</span> <span class="nav-text">增加默认返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">递归类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-GetKey-GetValue"><span class="nav-number">3.2.</span> <span class="nav-text">使用 GetKey GetValue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95"><span class="nav-number">4.</span> <span class="nav-text">拓展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#typescript-3-7"><span class="nav-number">4.1.</span> <span class="nav-text">typescript 3.7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A%E5%A5%87%E6%B7%AB%E6%8A%80%E5%B7%A7"><span class="nav-number">4.2.</span> <span class="nav-text">更多奇淫技巧</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TypeScript 泛型进阶篇
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-04 09:15:01" itemprop="dateCreated datePublished" datetime="2020-12-04T09:15:01+08:00">2020-12-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">编程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/TypeScript/" itemprop="url" rel="index"><span itemprop="name">TypeScript</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/" class="post-meta-item leancloud_visitors" data-flag-title="TypeScript 泛型进阶篇" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="leancloud-visitors-count"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.9k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>12 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>介绍 TypeScript 泛型的进阶应用，核心是递归类型</p>
+<p>Github Repo 地址：<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeS90eXBlc2NyaXB0LWdlbmVyaWM=">https://github.com/ilyydy/typescript-generic<i class="fa fa-external-link-alt"></i></span></p>
+<a id="more"></a>
+
+<h2 id="从一个问题出发"><a href="#从一个问题出发" class="headerlink" title="从一个问题出发"></a>从一个问题出发</h2><p>获取一个深层嵌套对象的底层属性值</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/index.ts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Obj = &#123;</span><br><span class="line">    a1: &#123;</span><br><span class="line">            b1: <span class="built_in">boolean</span></span><br><span class="line">            b2: &#123;</span><br><span class="line">                c1: <span class="built_in">string</span></span><br><span class="line">                c2: [<span class="number">1</span>, <span class="number">2</span>] | <span class="literal">undefined</span></span><br><span class="line">            &#125; | <span class="literal">null</span></span><br><span class="line">        &#125; | <span class="string">&quot;init&quot;</span></span><br><span class="line">    a2: <span class="built_in">number</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// src/1.ts</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f1</span>(<span class="params">param: Obj</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (</span><br><span class="line">        param.a1 !== <span class="string">&quot;init&quot;</span> &amp;&amp;</span><br><span class="line">        param.a1.b2 !== <span class="literal">null</span> &amp;&amp;</span><br><span class="line">        param.a1.b2.c2 !== <span class="literal">undefined</span></span><br><span class="line">    ) &#123;</span><br><span class="line">        <span class="keyword">const</span> v1 = param.a1.b2.c2[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">return</span> v1 <span class="comment">// 返回值类型是 1, 但必须层层判断类型</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用  lodash 的 get</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f2</span>(<span class="params">param: Obj</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> v2 = _.get(param, [<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;0&quot;</span>]) <span class="comment">// 路径不能提示，返回值类型是 any</span></span><br><span class="line">    <span class="keyword">return</span> v2</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="从1到复杂"><a href="#从1到复杂" class="headerlink" title="从1到复杂"></a>从1到复杂</h2><h3 id="获取第一层属性值"><a href="#获取第一层属性值" class="headerlink" title="获取第一层属性值"></a>获取第一层属性值</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/index.ts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> obj1: Obj = &#123;</span><br><span class="line">    a1: &#123;</span><br><span class="line">        b1: <span class="literal">false</span>,</span><br><span class="line">        b2: &#123;</span><br><span class="line">            c1: <span class="string">&quot;hello&quot;</span>,</span><br><span class="line">            c2: [<span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    a2: <span class="number">1</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> StrIndexObj = &#123; [index: <span class="built_in">string</span>]: <span class="built_in">any</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// src/2.ts</span></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;<span class="title">T</span>, <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>&gt;(<span class="params">param: T, k1: K1</span>): <span class="title">T</span>[<span class="title">K1</span>]</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">/* 参数 <span class="title">param</span> 输入 <span class="title">obj1</span> 后，参数 <span class="title">k1</span> 提示 &quot;<span class="title">a1</span>&quot; | &quot;<span class="title">a2</span>&quot;</span></span><br><span class="line"><span class="function">    参数 <span class="title">k1</span> 输入 &quot;<span class="title">a1</span>&quot; 后， <span class="title">test3</span> 类型为</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    b1: <span class="built_in">boolean</span>;</span><br><span class="line">    b2: &#123; <span class="attr">c1</span>: <span class="built_in">string</span>; c2: [<span class="number">1</span>, <span class="number">2</span>] | <span class="literal">undefined</span> &#125; | <span class="literal">null</span>;</span><br><span class="line">&#125; | <span class="string">&quot;init&quot;</span></span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> test3 = getProperty(obj1, <span class="string">&quot;a1&quot;</span>) <span class="comment">// ok</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="在此基础上尝试扩展"><a href="#在此基础上尝试扩展" class="headerlink" title="在此基础上尝试扩展"></a>在此基础上尝试扩展</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/2.ts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;<span class="title">T</span>, <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>, <span class="title">K2</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>[<span class="title">K1</span>]&gt;(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">    param: T,</span></span></span><br><span class="line"><span class="function"><span class="params">    k1: K1,</span></span></span><br><span class="line"><span class="function"><span class="params">    k2: K2</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">T</span>[<span class="title">K1</span>][<span class="title">K2</span>]</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">/* 参数 <span class="title">param</span> 输入 <span class="title">obj</span> 后， 参数 <span class="title">k1</span> 提示 &quot;<span class="title">a1</span>&quot; | &quot;<span class="title">a2</span>&quot;</span></span><br><span class="line"><span class="function">    参数 <span class="title">k1</span> 输入 &quot;<span class="title">a1</span>&quot; 后， 参数 <span class="title">k2</span> 提示 <span class="title">never</span></span></span><br><span class="line"><span class="function">*/</span></span><br><span class="line"><span class="function"><span class="title">const</span> <span class="title">test4</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span></span>) // <span class="title">error</span>, 类型“&quot;<span class="title">b2</span>&quot;”的参数不能赋给类型“<span class="title">never</span>”的参数</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> A1 = Obj[<span class="string">&quot;a1&quot;</span>]  <span class="comment">// 可能为 &quot;init&quot;</span></span><br><span class="line"><span class="keyword">type</span> KeyofA1_1 = keyof A1  <span class="comment">// 不能对 &quot;init&quot; 使用 keyof，所以 KeyofA1_1 为 never</span></span><br><span class="line"><span class="keyword">type</span> KeyofA1_2 = keyof Extract&lt;A1, StrIndexObj&gt;  <span class="comment">// &quot;b1&quot; | &quot;b2&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;<span class="title">T</span>, <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>, <span class="title">K2</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;&gt;(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">    param: T,</span></span></span><br><span class="line"><span class="function"><span class="params">    k1: K1,</span></span></span><br><span class="line"><span class="function"><span class="params">    k2: K2</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>]</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">/* <span class="title">test5</span> 类型为 </span>&#123;</span><br><span class="line">c1: <span class="built_in">string</span>;</span><br><span class="line">c2: [<span class="number">1</span>, <span class="number">2</span>] | <span class="literal">undefined</span>;</span><br><span class="line">&#125; | <span class="literal">null</span></span><br><span class="line">*/</span><br><span class="line"><span class="keyword">const</span> test5 = getProperty(obj1, <span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>) <span class="comment">// ok</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第三层</span></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;</span></span><br><span class="line"><span class="function">    <span class="title">T</span>,</span></span><br><span class="line"><span class="function">    <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>,</span></span><br><span class="line"><span class="function">    <span class="title">K2</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;,</span></span><br><span class="line"><span class="function">    <span class="title">K3</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>], <span class="title">StrIndexObj</span>&gt;</span></span><br><span class="line"><span class="function">&gt;(<span class="params">param: T, k1: K1, k2: K2, k3: K3</span>): <span class="title">Extract</span>&lt;<span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K3</span>]</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">const</span> <span class="title">test6</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;c2&quot;</span></span>)  //  [1, 2] | <span class="title">undefined</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="增加默认返回值"><a href="#增加默认返回值" class="headerlink" title="增加默认返回值"></a>增加默认返回值</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/3.ts</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 类似 lodash，将所有 key 的数组作为第二个参数，默认值作为第三个参数</span></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;<span class="title">T</span>, <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>&gt;(<span class="params">param: T, [k1]: [K1]</span>): <span class="title">T</span>[<span class="title">K1</span>]</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">T</span>,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">K2</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">D</span></span></span></span><br><span class="line"><span class="function"><span class="function">&gt;(<span class="params">param: T, [k1, k2]: [K1, K2], defaultValue: D</span>): <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>],  <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>] | <span class="title">D</span></span></span></span><br><span class="line"><span class="function"><span class="function"></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="title">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">T</span>,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K2</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K3</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>], <span class="title">StrIndexObj</span>&gt;,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">D</span></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">&gt;(<span class="params">param: T, [k1, k2, k3]: [K1, K2, K3], defaultValue: D</span>):  <span class="title">Extract</span>&lt;<span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>],  <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K3</span>] | <span class="title">D</span></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="title">const</span> <span class="title">test7</span> = <span class="title">getProperty</span>(<span class="params">obj1, [<span class="string">&quot;a1&quot;</span>]</span>)  // <span class="title">ok</span></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="title">const</span> <span class="title">test8</span> = <span class="title">getProperty</span>(<span class="params">obj1, [<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>], <span class="literal">undefined</span></span>)  // <span class="title">ok</span></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="title">const</span> <span class="title">test9</span> = <span class="title">getProperty</span>(<span class="params">obj1, [<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;c2&quot;</span>], <span class="literal">undefined</span></span>)  // 可以正确使用，但编辑器无法参数提示</span></span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不将所有 key 作为数组</span></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;<span class="title">T</span>, <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>&gt;(<span class="params">param: T, k1: K1</span>): <span class="title">T</span>[<span class="title">K1</span>]</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">T</span>,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">K2</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">D</span>,</span></span></span><br><span class="line"><span class="function"><span class="function">&gt;(<span class="params">param: T, k1: K1, k2: K2, defaultValue: D</span>): <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>] | <span class="title">D</span></span></span></span><br><span class="line"><span class="function"><span class="function"></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="title">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">T</span>,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K1</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">T</span>,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K2</span> <span class="title">extends</span> <span class="title">keyof</span> <span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K3</span> <span class="title">extends</span> <span class="title">keyof</span>  <span class="title">Extract</span>&lt;<span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>], <span class="title">StrIndexObj</span>&gt;,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">D</span>,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">&gt;(<span class="params">param: T, k1: K1, k2: K2, k3: K3, defaultValue: D</span>):  <span class="title">Extract</span>&lt;<span class="title">Extract</span>&lt;<span class="title">T</span>[<span class="title">K1</span>],  <span class="title">StrIndexObj</span>&gt;[<span class="title">K2</span>], <span class="title">StrIndexObj</span>&gt;[<span class="title">K3</span>] | <span class="title">D</span></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="title">const</span> <span class="title">test10</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span></span>)</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="title">const</span> <span class="title">test11</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;fault&quot;</span></span>)  // <span class="title">ok</span></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="title">const</span> <span class="title">test12</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;fault&quot;</span></span>)  // 可以正确使用，但需要先输入 <span class="title">defaultValue</span> 编辑器才能提示第 3 个 <span class="title">key</span></span></span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><p>如何简化 getProperty 的参数类型和返回值类型</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/4.ts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> GetKey&lt;T&gt; = keyof Extract&lt;T, StrIndexObj&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// but:</span></span><br><span class="line"><span class="keyword">type</span> test0 = keyof StrIndexObj <span class="comment">// string | number</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// so:</span></span><br><span class="line"><span class="keyword">type</span> GetKey&lt;T&gt; = T <span class="keyword">extends</span> StrIndexObj ? Extract&lt;keyof T, <span class="built_in">string</span>&gt; : <span class="built_in">never</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> test1 = GetKey&lt;Obj&gt; <span class="comment">// &quot;a1&quot; | &quot;a2&quot;</span></span><br><span class="line"><span class="keyword">type</span> test2 = GetKey&lt;<span class="built_in">string</span>&gt; <span class="comment">// never</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> GetValue&lt;T, KList <span class="keyword">extends</span> <span class="built_in">string</span>[]&gt; = ?</span><br></pre></td></tr></table></figure>
+
+<h3 id="递归类型"><a href="#递归类型" class="headerlink" title="递归类型"></a>递归类型</h3><p>思路： 递归使用 GetValue，每次消耗 KList 第一个元素，直到为空</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Head&lt;T <span class="keyword">extends</span> <span class="built_in">any</span>[]&gt; = T <span class="keyword">extends</span> [] ? <span class="built_in">never</span> : T[<span class="number">0</span>]</span><br><span class="line"><span class="keyword">type</span> test3 = Head&lt;[<span class="string">&quot;1&quot;</span>, <span class="number">2</span>]&gt; <span class="comment">// &quot;1&quot;</span></span><br><span class="line"><span class="keyword">type</span> test4 = Head&lt;<span class="built_in">string</span>[]&gt; <span class="comment">// string</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Tail&lt;T <span class="keyword">extends</span> <span class="built_in">any</span>[]&gt; = (<span class="function">(<span class="params">...t: T</span>) =&gt;</span> <span class="built_in">any</span>) <span class="keyword">extends</span> (<span class="function">(<span class="params">_: <span class="built_in">any</span>, ...tail: infer TT</span>) =&gt;</span> <span class="built_in">any</span>) ? TT : []</span><br><span class="line"><span class="keyword">type</span> test5 = Tail&lt;[<span class="string">&quot;1&quot;</span>, <span class="number">2</span>]&gt; <span class="comment">// [2]</span></span><br><span class="line"><span class="keyword">type</span> test6 = Tail&lt;<span class="built_in">string</span>[]&gt; <span class="comment">// string[]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Length&lt;T <span class="keyword">extends</span> <span class="built_in">any</span>[]&gt; = T[<span class="string">&quot;length&quot;</span>]</span><br><span class="line"><span class="keyword">type</span> test7 = Length&lt;[<span class="number">1</span>, <span class="number">2</span>]&gt; <span class="comment">// 2</span></span><br><span class="line"><span class="keyword">type</span> test8 = Length&lt;<span class="built_in">string</span>[]&gt;  <span class="comment">// number</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Last&lt;T <span class="keyword">extends</span> <span class="built_in">any</span>[]&gt; = T[Length&lt;Tail&lt;T&gt;&gt;]</span><br><span class="line"><span class="keyword">type</span> test9 = Last&lt;[<span class="string">&quot;1&quot;</span>, <span class="number">2</span>]&gt;</span><br><span class="line"><span class="keyword">type</span> test10 = Last&lt;<span class="built_in">string</span>[]&gt; <span class="comment">// string</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> GetValue&lt;T <span class="keyword">extends</span> StrIndexObj, KList <span class="keyword">extends</span> <span class="built_in">string</span>[]&gt; = &#123;</span><br><span class="line">    <span class="number">0</span>: T</span><br><span class="line">    <span class="number">1</span>: GetValue&lt;Extract&lt;T, StrIndexObj&gt;[Head&lt;KList&gt;], Tail&lt;KList&gt;&gt;</span><br><span class="line">&#125; [ KList <span class="keyword">extends</span> [] ? <span class="number">0</span> : <span class="number">1</span> ]</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> test11 = GetValue&lt;Obj, [<span class="string">&quot;a1&quot;</span>]&gt; <span class="comment">// ok</span></span><br><span class="line"><span class="keyword">type</span> test12 = GetValue&lt;Obj, [<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>]&gt; <span class="comment">// ok</span></span><br><span class="line"><span class="keyword">type</span> test13 = GetValue&lt;Obj, [<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;c2&quot;</span>]&gt; <span class="comment">// ok</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-GetKey-GetValue"><a href="#使用-GetKey-GetValue" class="headerlink" title="使用 GetKey GetValue"></a>使用 <code>GetKey</code> <code>GetValue</code></h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;<span class="title">T</span>, <span class="title">K1</span> <span class="title">extends</span> <span class="title">GetKey</span>&lt;<span class="title">T</span>&gt;&gt;(<span class="params">param: T, k1: K1</span>): <span class="title">GetValue</span>&lt;<span class="title">T</span>, [<span class="title">K1</span>]&gt;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">const</span> <span class="title">t1</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span></span>)  // <span class="title">ok</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">T</span>,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">K1</span> <span class="title">extends</span> <span class="title">GetKey</span>&lt;<span class="title">T</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">K2</span> <span class="title">extends</span> <span class="title">GetKey</span>&lt;<span class="title">GetValue</span>&lt;<span class="title">T</span>, [<span class="title">K1</span>]&gt;&gt;,</span></span></span><br><span class="line"><span class="function"><span class="function">    <span class="title">D</span>,</span></span></span><br><span class="line"><span class="function"><span class="function">&gt;(<span class="params">param: T, k1: K1, k2: K2, defaultValue: D</span>): <span class="title">GetValue</span>&lt;<span class="title">T</span>, [<span class="title">K1</span>, <span class="title">K2</span>]&gt; | <span class="title">D</span></span></span></span><br><span class="line"><span class="function"><span class="function"></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="title">const</span> <span class="title">t2</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;fault&quot;</span></span>)  // <span class="title">ok</span></span></span></span><br><span class="line"><span class="function"><span class="function"></span></span></span><br><span class="line"><span class="function"><span class="function"></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="title">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">getProperty</span>&lt;</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">T</span>,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K1</span> <span class="title">extends</span> <span class="title">GetKey</span>&lt;<span class="title">T</span>&gt;,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K2</span> <span class="title">extends</span> <span class="title">GetKey</span>&lt;<span class="title">GetValue</span>&lt;<span class="title">T</span>, [<span class="title">K1</span>]&gt;&gt;,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">K3</span> <span class="title">extends</span> <span class="title">GetKey</span>&lt;<span class="title">GetValue</span>&lt;<span class="title">T</span>, [<span class="title">K1</span>, <span class="title">K2</span>]&gt;&gt;,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">    <span class="title">D</span>,</span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function">&gt;(<span class="params">param: T, k1: K1, k2: K2, k3: K3, defaultValue: D</span>): <span class="title">GetValue</span>&lt;<span class="title">T</span>, [<span class="title">K1</span>, <span class="title">K2</span>, <span class="title">K3</span>]&gt; | <span class="title">D</span></span></span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="title">const</span> <span class="title">t3</span> = <span class="title">getProperty</span>(<span class="params">obj1, <span class="string">&quot;a1&quot;</span>, <span class="string">&quot;b2&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;fault&quot;</span></span>) // <span class="title">ok</span></span></span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><h3 id="typescript-3-7"><a href="#typescript-3-7" class="headerlink" title="typescript 3.7"></a>typescript 3.7</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Optional Chaining 特性, `?.` operator for optional property accesses. 只能用于 null, undefined 两种情况</span></span><br><span class="line"><span class="comment">// src/5.ts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> p1: &#123; <span class="attr">a</span>: <span class="literal">undefined</span> | <span class="literal">null</span> | &#123; <span class="attr">b</span>: <span class="number">1</span> &#125; &#125; = &#123; <span class="attr">a</span>: &#123; <span class="attr">b</span>: <span class="number">1</span>&#125; &#125;</span><br><span class="line"><span class="built_in">console</span>.log(p1.a?.b) <span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> p2: &#123; <span class="attr">a</span>: <span class="literal">undefined</span> | &#123; <span class="attr">b</span>: <span class="number">1</span> &#125; &#125; = &#123; <span class="attr">a</span>: <span class="literal">null</span> &#125;</span><br><span class="line"><span class="built_in">console</span>.log(p2.a?.b) <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="更多奇淫技巧"><a href="#更多奇淫技巧" class="headerlink" title="更多奇淫技巧"></a>更多奇淫技巧</h3><p><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0QtWS1Jbm5vdmF0aW9ucy90eXBlcy11dGlscw==">types-utils<i class="fa fa-external-link-alt"></i></span><br><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL01pY3Jvc29mdC9UeXBlU2NyaXB0L3B1bGwvMjQ4OTcjaXNzdWVjb21tZW50LTQwMTQxODI1NA==">typeScript 的核心开发者 Anders Hejlsberg 对此的看法<i class="fa fa-external-link-alt"></i></span></p>
+<blockquote>
+<p>It’s clever, but it definitely pushes things well beyond their  intended use. While it may work for small examples, it will scale horribly. Resolving those deeply recursive types consumes a lot of time and resources and might in the future run afoul of the recursion governors we have in the checker.</p>
+<p>Don’t do it!</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2020/12/04/TypeScript-泛型型变篇/" rel="bookmark">TypeScript 泛型型变篇</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2020/12/04/TypeScript-泛型基础篇/" rel="bookmark">TypeScript 泛型基础篇</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/TypeScript/" rel="tag"><i class="fa fa-tag"></i> TypeScript</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9F%BA%E7%A1%80%E7%AF%87/" rel="prev" title="TypeScript 泛型基础篇">
+                  <i class="fa fa-chevron-left"></i> TypeScript 泛型基础篇
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9E%8B%E5%8F%98%E7%AF%87/" rel="next" title="TypeScript 泛型型变篇">
+                  TypeScript 泛型型变篇 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">36k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:01</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@next-theme/pjax@0.4.0/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '.page-configurations',
+    '.main-inner',
+    '.post-toc-wrap',
+    '.languages',
+    '.pjax'
+  ],
+  analytics: false,
+  cacheBust: false,
+  scrollRestoration: false,
+  scrollTo: !CONFIG.bookmark.enable
+});
+
+document.addEventListener('pjax:success', () => {
+  pjax.executeScripts(document.querySelectorAll('script[data-pjax], .pjax script'));
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  const hasTOC = document.querySelector('.post-toc');
+  document.querySelector('.sidebar-inner').classList.toggle('sidebar-nav-active', hasTOC);
+  document.querySelector(hasTOC ? '.sidebar-nav-toc' : '.sidebar-nav-overview').click();
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  
+
+
+
+  <script data-pjax>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : 28335,
+      el    : 'wpac-rating',
+      color : '#fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+    <div class="pjax">
+  
+
+  
+  <script src="//cdn.jsdelivr.net/npm/quicklink@2.0.0/dist/quicklink.umd.js"></script>
+  <script>
+      window.addEventListener('load', () => {
+      quicklink.listen({
+        timeout : 3000,
+        priority: true,
+        ignores : [uri => uri.includes('#'),uri => uri === 'https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/',]
+      });
+      });
+  </script>
+
+<script>
+NexT.utils.loadComments('#valine-comments', () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    new Valine(Object.assign({"enable":true,"appId":"COd0Do6nIFtrj9S4VScfIEfT-MdYXbMMI","appKey":"MeXIRo6peAwwOEcQrOoWTQEG","serverURLs":null,"placeholder":"留下你的邮箱可以更快得到回复！","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"lang":null,"visitor":true,"comment_count":true,"recordIP":false,"enableQQ":false,"requiredFields":["nick"]}, {
+      el: '#valine-comments',
+      path: "/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/",
+      serverURLs: "https://cod0do6n.api.lncldglobal.com"
+    }));
+  }, window.Valine);
+});
+</script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+</body>
+</html>
