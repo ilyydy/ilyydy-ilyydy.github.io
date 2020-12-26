@@ -262,7 +262,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -481,7 +481,7 @@
 <li><strong>Next Ticks Queue</strong> - 使用 process.nextTick() 函数添加的回调</li>
 <li><strong>other Microtasks Queue</strong> - 包含其他微任务如成功的 Promise 回调</li>
 </ul>
-<h2 id="它是如何工作的？"><a href="#它是如何工作的？" class="headerlink" title="它是如何工作的？"></a>它是如何工作的？</h2><p>正如你在下面图表中所见，Node 开始事件循环先检查 timers 队列中是否有任何过期的 timers，然后在每个步骤中处理每个队列，同时保持对所有待处理对象的引用计数。处理完 close handlers 队列，如果在所有的队列中没有要处理的项，而且也没有挂起的操作，那么循环将会退出。在事件循环中每个队列的处理可以看做事件循环的一个阶段。</p>
+<h2 id="它是如何工作的？"><a href="#它是如何工作的？" class="headerlink" title="它是如何工作的？"></a>它是如何工作的？</h2><p>正如你在下面图表中所见，Node 开始事件循环先检查 timers 队列中是否有任何过期的 timers，然后在每个步骤中处理每个队列，同时保持对所有待处理对象的引用计数器。处理完 close handlers 队列，如果在所有的队列中没有要处理的项，而且也没有挂起的操作，那么循环将会退出。在事件循环中每个队列的处理过程可以看做事件循环的一个阶段。</p>
 <p><img data-src="4.all-Q.png"></p>
 <p>有趣的是被描绘成红色的中间队列，只要一个阶段结束，事件循环将会检查这两个中间阶段是否有要处理的项。如果有，事件循环会立马开始处理它们直到两个队列为空。一旦为空，事件循环就移到下一个阶段。</p>
 <blockquote>
@@ -507,6 +507,9 @@
       
   <div class="popular-posts-header">相关文章</div>
   <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2020/12/26/handling-io-nodejs-event-loop-part-4/" rel="bookmark">（译文）NodeJS 事件循环（四）- Handling IO</a></div>
+    </li>
     <li class="popular-posts-item">
       <div class="popular-posts-title"><a href="/2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" rel="bookmark">（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates</a></div>
     </li>
@@ -598,13 +601,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">52k</span>
+    <span title="站点总字数">59k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:27</span>
+    <span title="站点阅读时长">1:38</span>
   </span>
 </div>
   <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
