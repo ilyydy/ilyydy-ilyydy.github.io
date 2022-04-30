@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Ubuntu 18.04，Node.js v12.18.2 下 Github+Hexo+Next 的搭建记录摘要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Github+Hexo+Next 搭建记录摘要">
+<meta property="og:url" content="https://ilyydy.github.io/2020/11/23/Github-Hexo-Next-%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95%E6%91%98%E8%A6%81/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="Ubuntu 18.04，Node.js v12.18.2 下 Github+Hexo+Next 的搭建记录摘要">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-11-23T13:47:22.000Z">
+<meta property="article:modified_time" content="2022-04-03T12:43:20.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="Hexo">
+<meta property="article:tag" content="Next">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2020/11/23/Github-Hexo-Next-%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95%E6%91%98%E8%A6%81/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2020/11/23/Github-Hexo-Next-%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95%E6%91%98%E8%A6%81/","path":"2020/11/23/Github-Hexo-Next-搭建记录摘要/","title":"Github+Hexo+Next 搭建记录摘要"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Github+Hexo+Next 搭建记录摘要 | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#2022-04-03-20-39-22-%E6%9B%B4%E6%96%B0"><span class="nav-number">1.</span> <span class="nav-text">2022-04-03 20:39:22 更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">基础安装和配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Next-%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">Next 基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B9%E6%9C%8D%E5%8A%A1%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">第三方服务配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B7%E5%BC%8F%E4%BF%AE%E6%94%B9"><span class="nav-number">5.</span> <span class="nav-text">样式修改</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2020/11/23/Github-Hexo-Next-%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95%E6%91%98%E8%A6%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Github+Hexo+Next 搭建记录摘要 | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Github+Hexo+Next 搭建记录摘要
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-23 21:47:22" itemprop="dateCreated datePublished" datetime="2020-11-23T21:47:22+08:00">2020-11-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-04-03 20:43:20" itemprop="dateModified" datetime="2022-04-03T20:43:20+08:00">2022-04-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Hexo/" itemprop="url" rel="index"><span itemprop="name">Hexo</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>Ubuntu 18.04，Node.js v12.18.2 下 Github+Hexo+Next 的搭建记录摘要</p>
+<span id="more"></span>
+
+<h2 id="2022-04-03-20-39-22-更新"><a href="#2022-04-03-20-39-22-更新" class="headerlink" title="2022-04-03 20:39:22 更新"></a>2022-04-03 20:39:22 更新</h2><ul>
+<li>升级依赖，主要是 hexo 到 6.1.0</li>
+<li>评论系统改用 gitalk</li>
+<li>相关博文推荐插件去掉 hexo-related-popular-posts ，改用 hexo-related-posts</li>
+</ul>
+<h2 id="基础安装和配置"><a href="#基础安装和配置" class="headerlink" title="基础安装和配置"></a>基础安装和配置</h2><ol>
+<li>安装依赖</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 实际安装 hexo-cli: 4.2.0</span></span><br><span class="line">npm install -g hexo-cli --registry=https://registry.npm.taobao.org</span><br><span class="line">hexo init ilyydy.github.io --no-install</span><br><span class="line"><span class="built_in">cd</span> ilyydy.github.io</span><br><span class="line"><span class="comment"># 实际安装 hexo: 5.2.0</span></span><br><span class="line">npm install --registry=https://registry.npm.taobao.org</span><br><span class="line"><span class="comment"># 实际安装 next 8.0.2</span></span><br><span class="line">npm install hexo-theme-next --registry=https://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>修改站点配置文件 <code>_config.yml</code></li>
+</ol>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">title:</span> <span class="string">野草</span></span><br><span class="line"><span class="attr">subtitle:</span> <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">目的虽有，道路却无；我们所称之为路的，无非是踌躇</span></span><br><span class="line"><span class="attr">keywords:</span> <span class="string">学习</span> <span class="string">思考</span> <span class="string">技术</span></span><br><span class="line"><span class="attr">author:</span> <span class="string">张生</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="attr">timezone:</span> <span class="string">Asia/Shanghai</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 博客网址</span></span><br><span class="line"><span class="attr">url:</span> <span class="string">https://ilyydy.github.io/</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建新文章时自动创建一个同名的资源文件夹，存放与该文章有关的资源</span></span><br><span class="line"><span class="attr">post_asset_folder:</span> <span class="literal">true</span></span><br><span class="line"><span class="comment"># markdown 图片路径解析， hexo-renderer-marked 3.1.0 以后支持</span></span><br><span class="line"><span class="comment"># source/_posts/foo.md 中 `![](image.jpg)` 将被认为位于 `source/_posts/foo/image.jpg`</span></span><br><span class="line"><span class="attr">marked:</span></span><br><span class="line">  <span class="attr">prependRoot:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">postAsset:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 Next</span></span><br><span class="line"><span class="attr">theme:</span> <span class="string">next</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 部署</span></span><br><span class="line"><span class="comment"># 需要先在 Github 上建立和配置对应 Repo</span></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="comment">#对应仓库的SSH地址（可以在GitHub对应的仓库中复制）</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">git@github.com:ilyydy/ilyydy.github.io.git</span></span><br><span class="line">  <span class="comment">#（分支：User Pages为master，Project Pages为gh-pages）</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>查看效果<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br><span class="line"><span class="comment"># 浏览器访问 localhost:4000 查看效果</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Next-基本配置"><a href="#Next-基本配置" class="headerlink" title="Next 基本配置"></a>Next 基本配置</h2><ol>
+<li><p>准备 _config.next.yml</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> node_modules/hexo-theme-next/_config.yml _config.next.yml</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>_config.next.yml</code> 简单配置</p>
+</li>
+</ol>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 风格</span></span><br><span class="line"><span class="comment"># scheme: Muse</span></span><br><span class="line"><span class="attr">scheme:</span> <span class="string">Gemini</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 知识共享</span></span><br><span class="line"><span class="attr">creative_commons:</span></span><br><span class="line">  <span class="attr">sidebar:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 菜单</span></span><br><span class="line"><span class="comment"># about，tags，categories，commonweal 需要手动创建页面</span></span><br><span class="line"><span class="comment"># https://theme-next.js.org/docs/theme-settings/custom-pages.html</span></span><br><span class="line"><span class="attr">menu:</span></span><br><span class="line">  <span class="attr">home:</span> <span class="string">/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-home</span></span><br><span class="line">  <span class="attr">about:</span> <span class="string">/about/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-user</span></span><br><span class="line">  <span class="attr">tags:</span> <span class="string">/tags/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-tags</span></span><br><span class="line">  <span class="attr">categories:</span> <span class="string">/categories/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-th</span></span><br><span class="line">  <span class="attr">archives:</span> <span class="string">/archives/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-archive</span></span><br><span class="line">  <span class="attr">commonweal:</span> <span class="string">/404/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-heartbeat</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 头像</span></span><br><span class="line"><span class="attr">avatar:</span></span><br><span class="line">  <span class="comment"># 图片路径</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">/images/avatar.jpg</span></span><br><span class="line">  <span class="comment"># 圆角</span></span><br><span class="line">  <span class="attr">rounded:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># favicon</span></span><br><span class="line"><span class="comment"># https://realfavicongenerator.net/</span></span><br><span class="line"><span class="attr">favicon:</span></span><br><span class="line">  <span class="attr">small:</span> <span class="string">/images/favicon-16x16.png</span></span><br><span class="line">  <span class="attr">medium:</span> <span class="string">/images/favicon-32x32.png</span></span><br><span class="line">  <span class="attr">apple_touch_icon:</span> <span class="string">/images/apple-touch-icon.png</span></span><br><span class="line">  <span class="attr">safari_pinned_tab:</span> <span class="string">/images/safari-pinned-tab.svg</span></span><br><span class="line">  <span class="attr">android_manifest:</span> <span class="string">/images/site.webmanifest.json</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 社交链接</span></span><br><span class="line"><span class="attr">social:</span></span><br><span class="line">  <span class="attr">GitHub:</span> <span class="string">https://github.com/ilyydy</span> <span class="string">||</span> <span class="string">fab</span> <span class="string">fa-github</span></span><br><span class="line">  <span class="attr">E-Mail:</span> <span class="string">mailto:ilyydy@gmail.com</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-envelope</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 社交链接图标</span></span><br><span class="line"><span class="attr">social_icons:</span></span><br><span class="line">  <span class="attr">icons_only:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">transition:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 站点起始时间</span></span><br><span class="line"><span class="attr">footer:</span></span><br><span class="line">  <span class="attr">since:</span> <span class="number">2020</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 标签前缀图标</span></span><br><span class="line"><span class="attr">tag_icon:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">preconnect:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">mobile_layout_economy:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 代码块</span></span><br><span class="line"><span class="attr">codeblock:</span></span><br><span class="line">  <span class="attr">theme:</span></span><br><span class="line">    <span class="attr">light:</span> <span class="string">atom-one-dark</span></span><br><span class="line">    <span class="attr">dark:</span> <span class="string">atom-one-dark</span></span><br><span class="line">  <span class="attr">copy_button:</span></span><br><span class="line">    <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 阅读进度条</span></span><br><span class="line"><span class="attr">reading_progress:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 字体</span></span><br><span class="line"><span class="attr">font:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">host:</span> <span class="string">https://fonts.loli.net</span></span><br><span class="line">  <span class="attr">global:</span></span><br><span class="line">    <span class="attr">family:</span> <span class="string">Roboto,</span> <span class="string">Noto</span> <span class="string">Serif</span> <span class="string">SC,</span> <span class="string">PingFang</span> <span class="string">SC,</span> <span class="string">Microsoft</span> <span class="string">YaHei,</span> <span class="string">sans-serif</span></span><br><span class="line">  <span class="attr">codes:</span></span><br><span class="line">    <span class="attr">external:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">family:</span> <span class="string">Cascadia</span> <span class="string">Code,</span> <span class="string">consolas,</span> <span class="string">Menlo,</span> <span class="string">monospace</span></span><br><span class="line"></span><br><span class="line"><span class="attr">disable_baidu_transformation:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">exturl:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">pjax:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">fancybox:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">lazyload:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">pangu:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">quicklink:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 博文评分</span></span><br><span class="line"><span class="comment"># https://theme-next.js.org/docs/third-party-services/post-widgets.html#Widgetpack-Rating</span></span><br><span class="line"><span class="attr">rating:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">id:</span>     <span class="string">xxxx</span></span><br><span class="line">  <span class="attr">color:</span>  <span class="string">&quot;#fc6423&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># https://theme-next.js.org/docs/third-party-services/post-widgets.html#AddThis</span></span><br><span class="line"><span class="attr">add_this_id:</span>  <span class="string">xxxx</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="第三方服务配置"><a href="#第三方服务配置" class="headerlink" title="第三方服务配置"></a>第三方服务配置</h2><ol>
+<li>安装依赖</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># RSS</span></span><br><span class="line">npm install hexo-generator-feed --save --registry=https://registry.npm.taobao.org</span><br><span class="line"></span><br><span class="line"><span class="comment"># 阅读时间、字数</span></span><br><span class="line">npm install hexo-word-counter --save --registry=https://registry.npm.taobao.org</span><br><span class="line"></span><br><span class="line"><span class="comment"># 相关博文推荐</span></span><br><span class="line">npm install hexo-related-popular-posts --save --registry=https://registry.npm.taobao.org</span><br><span class="line"></span><br><span class="line"><span class="comment"># 站内搜索</span></span><br><span class="line">npm install hexo-generator-searchdb --registry=https://registry.npm.taobao.org</span><br><span class="line"></span><br><span class="line"><span class="comment"># 回到顶部、末尾</span></span><br><span class="line">npm install hexo-cake-moon-menu --registry=https://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>修改 <code>_config.yml</code></li>
+</ol>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 阅读时间、字数</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="attr">symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">total_symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">total_time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">exclude_codeblock:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">awl:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">wpm:</span> <span class="number">300</span></span><br><span class="line">  <span class="attr">suffix:</span> <span class="string">&quot;mins.&quot;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>修改 <code>_config.next.yml</code></li>
+</ol>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># RSS</span></span><br><span class="line"><span class="attr">social:</span></span><br><span class="line">  <span class="attr">RSS:</span> <span class="string">/atom.xml</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-rss</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 相关博文推荐</span></span><br><span class="line"><span class="attr">related_posts:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 站内搜索</span></span><br><span class="line"><span class="attr">local_search:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">back2top:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 评论系统</span></span><br><span class="line"><span class="comment"># https://theme-next.js.org/docs/third-party-services/comments.html#Valine-China</span></span><br><span class="line"><span class="attr">valine:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">appId:</span> <span class="string">xxxxxxxxxxxxx</span></span><br><span class="line">  <span class="attr">appKey:</span> <span class="string">xxxxxxxxxxxx</span></span><br><span class="line">  <span class="attr">placeholder:</span> <span class="string">留下你的邮箱可以更快得到回复！</span></span><br><span class="line">  <span class="attr">visitor:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">requiredFields:</span> [<span class="string">&#x27;nick&#x27;</span>]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="样式修改"><a href="#样式修改" class="headerlink" title="样式修改"></a>样式修改</h2><ul>
+<li><p><code>source/_data/styles.styl</code></p>
+<figure class="highlight styl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hide Sidebar on Mobile</span></span><br><span class="line">+<span class="built_in">tablet-mobile</span>() &#123;</span><br><span class="line">  <span class="selector-class">.sidebar-toggle</span>, <span class="selector-class">.sidebar</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: none;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.footer</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#202020</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.post</span> &#123;</span><br><span class="line">  <span class="attribute">margin-top</span>: -<span class="number">10px</span>;</span><br><span class="line">  <span class="attribute">margin-bottom</span>: <span class="number">60px</span>;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">10px</span>;</span><br><span class="line">  -webkit-<span class="attribute">box-shadow</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">5px</span> rgba(<span class="number">202</span>, <span class="number">203</span>, <span class="number">203</span>, .<span class="number">5</span>);</span><br><span class="line">  -moz-<span class="attribute">box-shadow</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">5px</span> rgba(<span class="number">202</span>, <span class="number">203</span>, <span class="number">204</span>, .<span class="number">5</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 背景图</span></span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>:url(/images/background.jpg);</span><br><span class="line">  <span class="attribute">background-repeat</span>: no-repeat;</span><br><span class="line">  <span class="attribute">background-attachment</span>:fixed; <span class="comment">//不重复</span></span><br><span class="line">  <span class="attribute">background-size</span>: cover;      <span class="comment">//填充</span></span><br><span class="line">  <span class="attribute">background-position</span>:<span class="number">50%</span> <span class="number">50%</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//博客内容透明化</span></span><br><span class="line"><span class="comment">//文章内容的透明度设置</span></span><br><span class="line"><span class="selector-class">.main-inner</span> &#123;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0.9</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//侧边框的透明度设置</span></span><br><span class="line"><span class="selector-class">.sidebar</span> &#123;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0.9</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 站点概况的透明度设置</span></span><br><span class="line"><span class="selector-class">.sidebar-inner</span> &#123;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0.9</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//菜单栏的透明度设置</span></span><br><span class="line"><span class="selector-class">.header-inner</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: rgba(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>,<span class="number">0.9</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//搜索框（local-search）的透明度设置</span></span><br><span class="line"><span class="selector-class">.popup</span> &#123;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0.9</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>source/_data/variables.styl</code></p>
+<figure class="highlight styl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 圆角设置</span></span><br><span class="line"><span class="variable">$border</span>-radius-inner     = <span class="number">20px</span> <span class="number">20px</span> <span class="number">20px</span> <span class="number">20px</span>;</span><br><span class="line"><span class="variable">$border</span>-radius           = <span class="number">20px</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>_config.next.yml</code></p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">custom_file_path:</span></span><br><span class="line">  <span class="attr">variable:</span> <span class="string">source/_data/variables.styl</span></span><br><span class="line">  <span class="attr">style:</span> <span class="string">source/_data/styles.styl</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hexo/" rel="tag"><i class="fa fa-tag"></i> Hexo</a>
+              <a href="/tags/Next/" rel="tag"><i class="fa fa-tag"></i> Next</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/10/%E5%BB%BF%E4%B8%80%E5%8F%B2%E5%BC%B9%E8%AF%8D/" rel="prev" title="廿一史弹词">
+                  <i class="fa fa-chevron-left"></i> 廿一史弹词
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/11/24/%E5%B9%B3%E9%9D%A2N%E7%82%B9%E6%B1%82%E5%85%B1%E7%BA%BF/" rel="next" title="平面 n 点求共线">
+                  平面 n 点求共线 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2020/11/23/Github-Hexo-Next-%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95%E6%91%98%E8%A6%81/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"e6421bfead90d63ce031065fc3860a16"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

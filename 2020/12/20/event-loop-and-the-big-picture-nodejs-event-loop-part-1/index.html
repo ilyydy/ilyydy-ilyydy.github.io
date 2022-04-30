@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="原文地址：Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017 处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（译文）NodeJS 事件循环（一）- 事件循环机制概述">
+<meta property="og:url" content="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="原文地址：Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017 处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilyydy.github.io/1.Event-Loop.jpeg">
+<meta property="og:image" content="https://ilyydy.github.io/2.Official-libuv-logo.png">
+<meta property="og:image" content="https://ilyydy.github.io/3.libuv-architecture.jpeg">
+<meta property="og:image" content="https://ilyydy.github.io/4.all-Q.png">
+<meta property="og:image" content="https://ilyydy.github.io/5.NodeJS-Architecture.png">
+<meta property="article:published_time" content="2020-12-20T05:42:18.000Z">
+<meta property="article:modified_time" content="2020-12-20T05:42:18.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="事件循环">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilyydy.github.io/1.Event-Loop.jpeg">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/","path":"2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/","title":"（译文）NodeJS 事件循环（一）- 事件循环机制概述"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>（译文）NodeJS 事件循环（一）- 事件循环机制概述 | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%BA%94%E5%99%A8%E6%A8%A1%E5%BC%8F-%EF%BC%88Reactor-Pattern%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">反应器模式 （Reactor Pattern）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%A4%9A%E8%B7%AF%E5%88%86%E5%8F%91%E5%99%A8-Event-Demultiplexer"><span class="nav-number">2.</span> <span class="nav-text">事件多路分发器 (Event Demultiplexer)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6-I-x2F-O-%E7%9A%84%E5%A4%8D%E6%9D%82%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">文件 I&#x2F;O 的复杂性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DNS-%E7%9A%84%E5%A4%8D%E6%9D%82%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">DNS 的复杂性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%EF%BC%9F"><span class="nav-number">2.3.</span> <span class="nav-text">解决办法？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%8A%E4%BB%96%E4%BB%AC%E6%8B%BC%E5%9C%A8%E4%B8%80%E8%B5%B7"><span class="nav-number">3.</span> <span class="nav-text">把他们拼在一起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%98%9F%E5%88%97"><span class="nav-number">4.</span> <span class="nav-text">事件队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%83%E6%98%AF%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">它是如何工作的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Next-tick-queue-vs-Other-Microtasks"><span class="nav-number">6.</span> <span class="nav-text">Next tick queue vs Other Microtasks</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="（译文）NodeJS 事件循环（一）- 事件循环机制概述 | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          （译文）NodeJS 事件循环（一）- 事件循环机制概述
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-20 13:42:18" itemprop="dateCreated datePublished" datetime="2020-12-20T13:42:18+08:00">2020-12-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">编程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/Node-js/" itemprop="url" rel="index"><span itemprop="name">Node.js</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYW5kLXRoZS1iaWctcGljdHVyZS1ub2RlanMtZXZlbnQtbG9vcC1wYXJ0LTEtMWNiNjdhMTgyODEw">Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”。这句话究竟意味着什么？“非阻塞”和“事件驱动”是什么意思？所有这些问题的答案涉及到 NodeJs 的核心，事件循环。在这个系列中，我会阐释什么是事件循环，它是如何工作的，它如何影响我们的应用，如何有效使用等等。在这篇文章中，我将讲解 NodeJs 如何工作，如何访问 I&#x2F;O，如何跨平台工作等等。</p>
+<span id="more"></span>
+
+<h2 id="反应器模式-（Reactor-Pattern）"><a href="#反应器模式-（Reactor-Pattern）" class="headerlink" title="反应器模式 （Reactor Pattern）"></a>反应器模式 （Reactor Pattern）</h2><p>NodeJS 在一个事件驱动的模型中工作，其中涉及到一个事件<strong>多路分用器（Event Demultiplexer）</strong> 和一个<strong>事件队列（Event Queue）</strong>。所有的 I&#x2F;O 请求最终会生成一个或成功或失败或其他触发器的<strong>事件（Event）</strong>。事件通过下面的算法进行处理。</p>
+<ol>
+<li>事件多路分用器接受 I&#x2F;O 请求并将这些请求委托给对应的硬件。</li>
+<li>当 I&#x2F;O 请求被处理时（例如：一个文件里的数据可以被读取，一个 socket 的数据可以被读取等），事件多路分用器将该特定动作的回调处理器添加到一个待处理的队列中。这些回调被称为事件，事件添加的队列被称为<strong>事件队列</strong>。</li>
+<li>当事件队列中存在待处理的事件时，它们会按入队的顺序依次执行，直到队列为空。</li>
+<li>如果事件队列中没有待处理的事件或者事件多路分用器没有挂起的请求，程序会结束。否则，又会从第一步重新开始。</li>
+</ol>
+<p>协调整个机制的程序被称为<strong>事件循环（Event Loop）</strong>。</p>
+<p><img data-src="/1.Event-Loop.jpeg" alt="Event Loop"></p>
+<p>事件循环是单线程和半无限的循环。因为它在没有更多的工作要做时会在一些点退出，这就是为什么称为半无限循环的原因。在开发者的视角，这就是程序退出的地方。</p>
+<blockquote>
+<p>注意: 不要将事件循环和 NodeJs 的 EventEmitter 混淆。EventEmitter 跟事件循环相比完全是另一个不同的概念。</p>
+</blockquote>
+<p>上面的图解是 NodeJs 如何工作的一个高层次概述，展示了反应器模式的主要组件。但是实际情况比这个要复杂的多，到底有多复杂？</p>
+<blockquote>
+<p>事件多路分发器不是在所有系统平台上处理所有 I&#x2F;O 的单一组件。<br>事件队列并不像图中展示的那样是一个所有事件都入队和出队的单独队列。并且 I&#x2F;O 不是唯一入队的事件类型。</p>
+</blockquote>
+<p>因此，让我们更深入些。</p>
+<h2 id="事件多路分发器-Event-Demultiplexer"><a href="#事件多路分发器-Event-Demultiplexer" class="headerlink" title="事件多路分发器 (Event Demultiplexer)"></a>事件多路分发器 (Event Demultiplexer)</h2><p>事件多路分发器不是一个在真实世界中存在的组件，而是反应器模式中的一个抽象概念。现实世界中，事件多路分发器在不同的系统中有不同的实现。比如在 Linux 中的 <strong>epoll</strong> ，BSD（MacOS）系统中的 <strong>kqueue</strong> ，Solaris 中的 <strong>event ports</strong> ，windows 中的 <strong>IOCP（Input Output Completion Port）</strong>等等。NodeJS 利用这些实现提供的底层，非阻塞异步的硬件 I&#x2F;O 能力。</p>
+<h3 id="文件-I-x2F-O-的复杂性"><a href="#文件-I-x2F-O-的复杂性" class="headerlink" title="文件 I&#x2F;O 的复杂性"></a>文件 I&#x2F;O 的复杂性</h3><p>但令人烦心的是，并不是所有类型的 I&#x2F;O 都可以使用这些实现执行。即使在同一操作系统平台，对不同类型的 I&#x2F;O 的支持也十分复杂。典型的例子，网络 I&#x2F;O 使用 epoll，kqueu，events ports 和 IOCP 可以以非阻塞的方式执行。但是文件 I&#x2F;O 则不一定。特定的系统，如 Linux 不支持完全的异步访问文件系统。并且在 MacOS 系统上 kquue 的文件系统事件通知和信号有很多限制(<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmxpYnRvcnJlbnQub3JnLzIwMTIvMTAvYXN5bmNocm9ub3VzLWRpc2staW8v">更多相关介绍<i class="fa fa-external-link-alt"></i></span>)。情况复杂到以至于几乎不可能同时处理所有文件系统的复杂度来提供完整的异步功能。</p>
+<h3 id="DNS-的复杂性"><a href="#DNS-的复杂性" class="headerlink" title="DNS 的复杂性"></a>DNS 的复杂性</h3><p>与文件 I&#x2F;O 相似，Node API 提供的 DNS 函数也有一定的<span class="exturl" data-url="aHR0cHM6Ly9ub2RlanMub3JnL2FwaS9kbnMuaHRtbCNkbnNfaW1wbGVtZW50YXRpb25fY29uc2lkZXJhdGlvbnM=">复杂性<i class="fa fa-external-link-alt"></i></span>。因为 NodeJS DNS 函数如 dns.lookup，会访问系统配置文件如 nsswitch.conf，resolve.conf 和 &#x2F;etc&#x2F;hosts，之前提到的文件系统的复杂性也适用于 dns.lookup 函数。</p>
+<h3 id="解决办法？"><a href="#解决办法？" class="headerlink" title="解决办法？"></a>解决办法？</h3><p>因此，引入了一个<strong>线程池</strong>来提供不能被硬件异步 I&#x2F;O 工具（epoll&#x2F;kqueue&#x2F;event ports&#x2F;IOCP）直接支持的 I&#x2F;O 功能。现在我们知道并不是所有的 I&#x2F;O 功能发生在线程池。NodeJS 尽最大的努力使用非阻塞和异步硬件 I&#x2F;O 来处理大部分的 I&#x2F;O 工作，但是对于那些阻塞或者处理起来很复杂的 I&#x2F;O，则使用线程池。</p>
+<blockquote>
+<p>但是 I&#x2F;O 不是线程池唯一处理的任务。Node.js 的部分 <code>crypto</code> 功能如 <code>crypto.pbkdf2</code>，异步版本的 <code>crypto.randomBytes</code>，<code>crypto.randomFill</code>，异步版本的 <code>zlib</code> 也运行在 libuv 的线程池。因为它们属于 CPU 密集型工作，在线程池工作能够避免阻塞事件循环。</p>
+</blockquote>
+<h2 id="把他们拼在一起"><a href="#把他们拼在一起" class="headerlink" title="把他们拼在一起"></a>把他们拼在一起</h2><p>正如我们看到的，实际世界中，在所有不同操作系统平台支持所有不同类型的 I&#x2F;O（文件 I&#x2F;O，网络 I&#x2F;O，DNS 等）非常困难。一部分 I&#x2F;O 可以使用原生硬件实现执行，同时保留完整的异步，另外一部分类型的 I&#x2F;O 则需要在线程池中执行以保证异步特性。</p>
+<blockquote>
+<p>Node 开发者中，一个普遍的误解是 Node 在线程池中处理所有的 I&#x2F;O。</p>
+</blockquote>
+<p>为了管理整个过程同时支持跨平台的 I&#x2F;O，应该有一个抽象层封装了平台间和平台内的复杂度，并且为 Node 提供上层通用 API。</p>
+<p>那么是谁呢？女士们，先生们，有请 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2xpYnV2L2xpYnV2">libuv<i class="fa fa-external-link-alt"></i></span></p>
+<p><img data-src="/2.Official-libuv-logo.png" alt="Official-libuv-logo.png"></p>
+<p><span class="exturl" data-url="aHR0cDovL2RvY3MubGlidXYub3JnL2VuL3YxLngvZGVzaWduLmh0bWw=">official libuv docs<i class="fa fa-external-link-alt"></i></span></p>
+<blockquote>
+<p>libuv is cross-platform support library which was originally written for NodeJS. It’s designed around the event-driven asynchronous I&#x2F;O model.</p>
+</blockquote>
+<blockquote>
+<p>The library provides much more than a simple abstraction over different I&#x2F;O polling mechanisms: ‘handles’ and ‘streams’ provide a high level abstraction for sockets and other entities; cross-platform file I&#x2F;O and threading functionality is also provided, amongst other things.</p>
+</blockquote>
+<p>让我们看下 libuv 的组成。下面的图表来自于官方文档，描述了暴露出的通用 API 处理了哪些不同类型的 I&#x2F;O。</p>
+<p><img data-src="/3.libuv-architecture.jpeg" alt="libuv-architecture"></p>
+<p>现在我们知道<strong>事件多路分发器</strong>，不是一个原子的实体，而是一个被 Libuv 抽象出的处理 I&#x2F;O 过程的 APIs 集合，暴露给 NodeJS 的上层使用。libuv 除了提供事件多路分发器给 Node，它还为 NodeJS 提供了完整的事件循环功能，包含事件队列机制。</p>
+<p>现在让我们看下<strong>事件队列</strong>。</p>
+<h2 id="事件队列"><a href="#事件队列" class="headerlink" title="事件队列"></a>事件队列</h2><p>事件队列按理说是一个所有事件入队，然后事件循环按顺序处理，直到队列为空的数据结构。但是在 Node 中实际发生的和反应器模式描述的完全不同。所以差异在哪？</p>
+<blockquote>
+<p>NodeJS 中不止一个队列，不同类型的事件会在它们自己的队列中入队。<br>在处理完一个阶段后，移向下一个阶段之前，事件循环将会处理两个中间队列，直到两个中间队列为空。</p>
+</blockquote>
+<p>那么总共有多少个队列呢？中间队列又是什么？</p>
+<p>有 4 个主要类型的队列，被原生的 libuv 事件循环处理。</p>
+<ul>
+<li><strong>Expired timers and intervals Queue</strong>— 使用 setTimeout 添加的过期计时器的回调或者使用 setInterval 添加的间隔函数。</li>
+<li><strong>IO Events Queue</strong>— 完成的 I&#x2F;O 事件</li>
+<li><strong>Immediate queue</strong>- 使用 setImmediate 函数添加的回调</li>
+<li><strong>Close Handlers Queue</strong>- 任何一个 close 事件处理器。</li>
+</ul>
+<blockquote>
+<p>注意，尽管我在这里为方便说 “队列”，但它们中的一些实际上有不同类型的数据结构（timers 被存储在最小堆里）</p>
+</blockquote>
+<p>除了四个主要的队列，这里另外有两个我之前提到的 “中间队列”，它们被 Node 处理。这些队列不是 libuv 的一部分，而是 NodeJS 的一部分。它们分别是：</p>
+<ul>
+<li><strong>Next Ticks Queue</strong> - 使用 process.nextTick() 函数添加的回调</li>
+<li><strong>other Microtasks Queue</strong> - 包含其他微任务如成功的 Promise 回调</li>
+</ul>
+<h2 id="它是如何工作的？"><a href="#它是如何工作的？" class="headerlink" title="它是如何工作的？"></a>它是如何工作的？</h2><p>正如你在下面图表中所见，Node 开始事件循环先检查 timers 队列中是否有任何过期的 timers，然后在每个步骤中处理每个队列，同时保持对所有待处理对象的引用计数器。处理完 close handlers 队列，如果在所有的队列中没有要处理的项，而且也没有挂起的操作，那么循环将会退出。在事件循环中每个队列的处理过程可以看做事件循环的一个阶段。</p>
+<p><img data-src="/4.all-Q.png"></p>
+<p>有趣的是被描绘成红色的中间队列，只要一个阶段结束，事件循环将会检查这两个中间阶段是否有要处理的项。如果有，事件循环会立马开始处理它们直到两个队列为空。一旦为空，事件循环就移到下一个阶段。</p>
+<blockquote>
+<p>E.g, 事件循环当前处理有着 5 个事件处理器的 immediate queue。同时，两个处理器回调被添加到 next tick queue。一旦事件处理器完成 immediate queue 中的 5 个事件处理器，事件循环将会在移到 close handlers 队列之前检测到 next tick queue 里面有两个要处理的项。然后事件处理器会处理完 next tick queue 里面的处理器。然后移到 close handlers 队列。</p>
+</blockquote>
+<h2 id="Next-tick-queue-vs-Other-Microtasks"><a href="#Next-tick-queue-vs-Other-Microtasks" class="headerlink" title="Next tick queue vs Other Microtasks"></a>Next tick queue vs Other Microtasks</h2><p>next tick queue 比 other micotasks 有着更高的优先级。当在一个阶段的结尾时 libuv 传递控制权给 Node 的高层，这时这两个队列都在事件循环的两个阶段之间被处理。你应该注意到我用暗红色来表示 next tick queue，这意味着在开始处理 promise 的微队列之前，next tick queue 是空的。</p>
+<blockquote>
+<p>next tick queue 的优先级比 promise 的高仅仅适合于 V8 提供的原生 JS 提供的 promise。如果你使用一个 q 库或者 bluebird, 你将会观察到一个不同的结果，因为它们早于原生的 promise，有不同的语义。q 和 bluebird 处理 promise 也有不同的方式，后面的文章我会解释。</p>
+</blockquote>
+<p>这些所谓的中间队列引入了一个新的问题，IO 饿死。广泛的使用 <code>process.nextTick</code> 填充 next tick queue 将会强迫事件循环处理 next tick queue 而不前进。这将会导致 IO 饿死，因为 next tick queue 未被清空前事件循环不能继续。</p>
+<blockquote>
+<p>为了防止这种清空，这里有一个 next tick queue 的最大限制，可以使用 <code>procsess.maxTickDepth</code> 参数设置，但是已经从 NodeJS v0.12 移除了。具体查看<span class="exturl" data-url="aHR0cHM6Ly9zdHJvbmdsb29wLmNvbS9zdHJvbmdibG9nL25vZGUtanMtdjAtMTItYXBpcy1icmVha2luZy8jcHJvY2Vzc19tYXh0aWNrZGVwdGhfcmVtb3ZlZA==">原因<i class="fa fa-external-link-alt"></i></span>。 </p>
+</blockquote>
+<p>我将会在之后的文章中用示例深入讨论这些队列。</p>
+<p>最后，你知道了什么是事件循环，如何实现的和 Node 处理异步 I&#x2F;O。让我们看下 Libuv 在 NodeJS 架构中的位置。</p>
+<p><img data-src="/5.NodeJS-Architecture.png" alt="NodeJS-Architecture"></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-26</div>
+      <div class="popular-posts-title"><a href="2020/12/26/handling-io-nodejs-event-loop-part-4/" rel="bookmark">（译文）NodeJS 事件循环（四）- Handling IO</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2hhbmRsaW5nLWlvLW5vZGVqcy1ldmVudC1sb29wLXBhcnQtNC00MTgwNjJmOTE3ZDE=">Handling IO — NodeJS Event Loop Part 4, Deepal Jayasekara, Nov 26, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>系列上篇文章 <a href="/2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" title="（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates">（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates</a></p>
+<p>本篇文章中，我将详细讨论 NodeJS 如何处理 I&#x2F;O，深入探讨事件循环的实现以及 I&#x2F;O 如何与其他异步操作组合在一起。如果你尚未阅读本系列前面 3 篇文章，我建议你先看看它们，我在它们中探讨了 NodeJS 事件循环的其他许多概念。</p></p></div>
+    </li>
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/" rel="bookmark">（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3RpbWVycy1pbW1lZGlhdGVzLWFuZC1wcm9jZXNzLW5leHR0aWNrLW5vZGVqcy1ldmVudC1sb29wLXBhcnQtMi0yYzUzZmQ1MTFiYjM=">Timers, Immediates and Process.nextTick— NodeJS Event Loop Part 2, Deepal Jayasekara, May 11, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>上篇文章 <a href="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" title="（译文）NodeJS 事件循环（一）- 事件循环机制概述">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a> 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates and process.nextTick 回调。</p></p></div>
+    </li>
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" rel="bookmark">（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3Byb21pc2VzLW5leHQtdGlja3MtYW5kLWltbWVkaWF0ZXMtbm9kZWpzLWV2ZW50LWxvb3AtcGFydC0zLTkyMjZjYmU3YTZhYQ==">Promises, Next-Ticks, and Immediates— NodeJS Event Loop Part 3, Deepal Jayasekara, Jul 22, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>系列上篇文章 <a href="/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/" title="（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick">（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick</a> 讲述了事件循环中的计时器，immediates 和每个队列如何按顺序执行。这篇文章将关注事件循环如何处理 resolved&#x2F;rejected promises (包括原生的 JS promises, Q promises, 和 Bluebird promises) 和 next tick 回调。如果你对 Promises 不熟悉，建议你先对 Promises 进行初步了解。</p></p></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"><i class="fa fa-tag"></i> Node.js</a>
+              <a href="/tags/%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/" rel="tag"><i class="fa fa-tag"></i> 事件循环</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9E%8B%E5%8F%98%E7%AF%87/" rel="prev" title="TypeScript 泛型型变篇">
+                  <i class="fa fa-chevron-left"></i> TypeScript 泛型型变篇
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/" rel="next" title="（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick">
+                  （译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"539a8e07e4c22783077e610e8a461208"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

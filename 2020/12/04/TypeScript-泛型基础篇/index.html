@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="介绍 TypeScript 泛型的基础常用知识和用法 Github Repo 地址：https:&#x2F;&#x2F;github.com&#x2F;ilyydy&#x2F;typescript-generic">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TypeScript 泛型基础篇">
+<meta property="og:url" content="https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9F%BA%E7%A1%80%E7%AF%87/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="介绍 TypeScript 泛型的基础常用知识和用法 Github Repo 地址：https:&#x2F;&#x2F;github.com&#x2F;ilyydy&#x2F;typescript-generic">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-12-04T01:12:01.000Z">
+<meta property="article:modified_time" content="2020-12-04T01:12:01.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="TypeScript">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9F%BA%E7%A1%80%E7%AF%87/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9F%BA%E7%A1%80%E7%AF%87/","path":"2020/12/04/TypeScript-泛型基础篇/","title":"TypeScript 泛型基础篇"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>TypeScript 泛型基础篇 | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%BB%84%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">构造可复用组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E4%BA%8E%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">用于函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E4%BA%8E%E7%B1%BB"><span class="nav-number">1.2.</span> <span class="nav-text">用于类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E4%BA%8E%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">用于类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%93%E5%B1%95"><span class="nav-number">1.4.</span> <span class="nav-text">拓展</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E7%BA%A6%E6%9D%9F"><span class="nav-number">2.</span> <span class="nav-text">泛型约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">高级类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#extends-%E6%9D%A1%E4%BB%B6%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">extends 条件类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#infer-%E6%9D%A1%E4%BB%B6%E6%8E%A8%E6%96%AD"><span class="nav-number">3.2.</span> <span class="nav-text">infer 条件推断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%98%E6%96%B9%E9%A2%84%E8%AE%BE%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B7%A5%E5%85%B7%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.3.</span> <span class="nav-text">官方预设的一些工具类型</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9F%BA%E7%A1%80%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="TypeScript 泛型基础篇 | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TypeScript 泛型基础篇
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-04 09:12:01" itemprop="dateCreated datePublished" datetime="2020-12-04T09:12:01+08:00">2020-12-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">编程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/TypeScript/" itemprop="url" rel="index"><span itemprop="name">TypeScript</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>11k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>19 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>介绍 TypeScript 泛型的基础常用知识和用法</p>
+<p>Github Repo 地址：<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeS90eXBlc2NyaXB0LWdlbmVyaWM=">https://github.com/ilyydy/typescript-generic<i class="fa fa-external-link-alt"></i></span></p>
+<span id="more"></span>
+
+<p>目的：</p>
+<ol>
+<li>创建可复用的组件，一个组件可以支持多种类型的数据</li>
+<li>对组件的类型进行约束</li>
+</ol>
+<p>可用于：</p>
+<ul>
+<li>函数参数</li>
+<li>函数返回值</li>
+<li>类的实例成员</li>
+<li>类的实例方法</li>
+<li>…</li>
+</ul>
+<p>主要资料：</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudHlwZXNjcmlwdGxhbmcub3JnL2RvY3MvaGFuZGJvb2svZ2VuZXJpY3MuaHRtbA==">typescript: generics<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudHlwZXNjcmlwdGxhbmcub3JnL2RvY3MvaGFuZGJvb2svYWR2YW5jZWQtdHlwZXMuaHRtbA==">typescript: advanced-types<i class="fa fa-external-link-alt"></i></span>  </li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudHNsYW5nLmNuL2RvY3MvaGFuZGJvb2svZnVuY3Rpb25zLmh0bWw=">typescript: functions<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+<h2 id="构造可复用组件"><a href="#构造可复用组件" class="headerlink" title="构造可复用组件"></a>构造可复用组件</h2><h3 id="用于函数"><a href="#用于函数" class="headerlink" title="用于函数"></a>用于函数</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/0.ts</span></span><br><span class="line"><span class="comment">// 目标为构建 identity 函数： 这个函数会返回任何传入它的值</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title class_">First</span> &#123;</span><br><span class="line">    <span class="comment">// 1. 参数使用 any, 返回值丢失传入参数的类型</span></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">identity</span>(<span class="params">arg: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> arg</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> r1 = <span class="title function_">identity</span>(<span class="string">&quot;test&quot;</span>) <span class="comment">// any</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title class_">Second</span> &#123;</span><br><span class="line">    <span class="comment">// 2. 使用函数签名的类型重载</span></span><br><span class="line">    <span class="comment">// 编译器根据调用函数时实际传入的参数类型，依次和函数定义进行匹配，直到匹配到第一条合适的</span></span><br><span class="line">    <span class="comment">// 但每种需要的类型都必须写出来</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">identity</span>(<span class="params">arg: <span class="built_in">string</span></span>): <span class="built_in">string</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">identity</span>(<span class="params">arg: <span class="built_in">number</span></span>): <span class="built_in">number</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">identity</span>(<span class="params">arg: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> arg</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> r2 = <span class="title function_">identity</span>(<span class="string">&quot;test&quot;</span>) <span class="comment">// string</span></span><br><span class="line">    <span class="keyword">const</span> r3 = <span class="title function_">identity</span>(<span class="number">1</span>) <span class="comment">// number</span></span><br><span class="line">    <span class="keyword">const</span> r4 = <span class="title function_">identity</span>([<span class="number">1</span>]) <span class="comment">// error, No overload matches this call.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title class_">Third</span> &#123;</span><br><span class="line">    <span class="comment">// 3.使用泛型</span></span><br><span class="line">    <span class="keyword">function</span> identity&lt;T&gt;(<span class="attr">arg</span>: T) &#123;</span><br><span class="line">        <span class="keyword">return</span> arg</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显式地指明类型参数 T 的类型</span></span><br><span class="line">    <span class="keyword">const</span> output1 = identity&lt;<span class="built_in">string</span>&gt;(<span class="string">&quot;myString&quot;</span>) <span class="comment">// type of output will be &#x27;string&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更好的做法：利用了类型推论，编译器会根据传入的参数自动地帮助我们确定 T 的类型</span></span><br><span class="line">    <span class="keyword">const</span> output2 = <span class="title function_">identity</span>(<span class="string">&quot;myString&quot;</span>) <span class="comment">// type of output will be &#x27;myString&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title class_">Forth</span> &#123;</span><br><span class="line">    <span class="comment">// 也可以直接构造函数类型</span></span><br><span class="line">    <span class="keyword">type</span> <span class="title class_">IdentityFunc</span> = &lt;T&gt;<span class="function">(<span class="params">arg: T</span>) =&gt;</span> T</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="attr">identity</span>: <span class="title class_">IdentityFunc</span> = <span class="function">(<span class="params">arg: <span class="built_in">any</span></span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> arg</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显式地指明类型参数 T 的类型</span></span><br><span class="line">    <span class="keyword">const</span> output3 = identity&lt;<span class="built_in">string</span>&gt;(<span class="string">&quot;myString&quot;</span>) <span class="comment">// type of output will be &#x27;string&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更好的做法：利用了类型推论，编译器会根据传入的参数自动地帮助我们确定 T 的类型</span></span><br><span class="line">    <span class="keyword">const</span> output4 = <span class="title function_">identity</span>(<span class="string">&quot;myString&quot;</span>) <span class="comment">// type of output will be &#x27;myString&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 常用场景：</span></span><br><span class="line"><span class="comment">// 1.通过 axios 从服务端获取数据</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">f1</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// 默认为 any</span></span><br><span class="line">    <span class="keyword">const</span> t1 = <span class="keyword">await</span> A.<span class="title function_">get</span>(<span class="string">&quot;http://someUrl&quot;</span>) <span class="comment">// AxiosResponse&lt;any&gt;</span></span><br><span class="line">    <span class="keyword">const</span> data1 = t1.<span class="property">data</span> <span class="comment">// any</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> t2 = <span class="keyword">await</span> A.<span class="property">get</span>&lt;<span class="built_in">string</span>&gt;(<span class="string">&quot;http://someUrl&quot;</span>) <span class="comment">// AxiosResponse&lt;string&gt;</span></span><br><span class="line">    <span class="keyword">const</span> data2 = t2.<span class="property">data</span> <span class="comment">// string</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">type</span> <span class="title class_">Template</span>&lt;T&gt; = &#123; <span class="attr">code</span>: <span class="built_in">number</span>; <span class="attr">data</span>: T; <span class="attr">success</span>: <span class="built_in">boolean</span> &#125;</span><br><span class="line">    <span class="keyword">const</span> t3 = <span class="keyword">await</span> A.<span class="property">get</span>&lt;<span class="title class_">Template</span>&lt;<span class="built_in">string</span>&gt;&gt;(<span class="string">&quot;http://someUrl&quot;</span>) <span class="comment">// AxiosResponse&lt;Template&lt;string&gt;&gt;</span></span><br><span class="line">    <span class="keyword">const</span> data3 = t3.<span class="property">data</span> <span class="comment">// Template&lt;string&gt;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2. 通过数据库 client 从数据库获取数据</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">f2</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> client = <span class="keyword">new</span> <span class="title class_">MongoClient</span>(<span class="string">&quot;someUri&quot;</span>)</span><br><span class="line">    <span class="keyword">const</span> db = client.<span class="title function_">db</span>(<span class="string">&quot;someDb&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> c1 = db.<span class="title function_">collection</span>(<span class="string">&quot;c1&quot;</span>) <span class="comment">// Collection&lt;any&gt;</span></span><br><span class="line">    <span class="keyword">const</span> data1 = <span class="keyword">await</span> c1.<span class="title function_">find</span>(&#123;&#125;).<span class="title function_">toArray</span>() <span class="comment">// any[]</span></span><br><span class="line">    <span class="keyword">const</span> data2 = <span class="keyword">await</span> c1.<span class="property">find</span>&lt;&#123; <span class="attr">id</span>: <span class="built_in">string</span>; <span class="attr">name</span>: <span class="built_in">string</span> &#125;&gt;(&#123;&#125;).<span class="title function_">toArray</span>() <span class="comment">// &#123; id: string; name: string &#125;[]</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> c2 = db.<span class="property">collection</span>&lt;&#123; <span class="attr">id</span>: <span class="built_in">string</span>; <span class="attr">name</span>: <span class="built_in">string</span> &#125;&gt;(<span class="string">&quot;c2&quot;</span>) <span class="comment">// Collection&lt;&#123; id: string; name: string &#125;&gt;</span></span><br><span class="line">    <span class="keyword">const</span> data3 = <span class="keyword">await</span> c2.<span class="title function_">find</span>(&#123;&#125;).<span class="title function_">toArray</span>() <span class="comment">// &#123; id: string; name: string &#125;[]，而且能对 query 进行提示</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="用于类"><a href="#用于类" class="headerlink" title="用于类"></a>用于类</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Queue1</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="attr">data</span>: T[] = []</span><br><span class="line"></span><br><span class="line">    <span class="title function_">push</span>(<span class="params">item: T</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">data</span>.<span class="title function_">push</span>(item)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">shift</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">data</span>.<span class="title function_">shift</span>()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> queue = <span class="keyword">new</span> <span class="title class_">Queue1</span>&lt;<span class="built_in">number</span>&gt;()</span><br><span class="line">queue.<span class="title function_">push</span>(<span class="number">0</span>)</span><br><span class="line">queue.<span class="title function_">push</span>(<span class="string">&quot;1&quot;</span>) <span class="comment">// Error：不能推入一个 `string`，只有 number 类型被允许</span></span><br><span class="line"><span class="keyword">const</span> last = <span class="keyword">new</span> <span class="title class_">Queue1</span>().<span class="title function_">shift</span>() <span class="comment">// 默认值为 unknown, TypeScript 3.0 引进, 与 any 相对</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 类的静态成员不能使用泛型类型</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Queue2</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="attr">data</span>: T[] = []</span><br><span class="line"></span><br><span class="line">    <span class="title function_">push</span>(<span class="params">item: T</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">data</span>.<span class="title function_">push</span>(item)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">shift</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">data</span>.<span class="title function_">shift</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="attr">a</span>: T[] = [] <span class="comment">// error</span></span><br><span class="line">    <span class="keyword">static</span> <span class="title function_">f</span>(<span class="params">p: T</span>) &#123; &#125; <span class="comment">// error</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 以固定机场为例</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">StationaryV1</span> = &#123; <span class="attr">version</span>: <span class="string">&quot;v1&quot;</span>; <span class="attr">plc</span>: <span class="string">&quot;closed&quot;</span>; <span class="attr">a</span>: <span class="built_in">string</span>; <span class="attr">d</span>: &#123; <span class="attr">e</span>: <span class="built_in">string</span> &#125; &#125;</span><br><span class="line"><span class="keyword">type</span> <span class="title class_">StationaryV2</span> = &#123; <span class="attr">version</span>: <span class="string">&quot;v2&quot;</span>; <span class="attr">plc</span>: <span class="string">&quot;closed&quot;</span>; <span class="attr">b</span>: <span class="built_in">number</span>; <span class="attr">d</span>: &#123; <span class="attr">f</span>: <span class="built_in">number</span> &#125; &#125;</span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Stationary</span> = <span class="title class_">StationaryV1</span> | <span class="title class_">StationaryV2</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> S1 &#123;</span><br><span class="line">    <span class="comment">// 不使用泛型</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">Controller</span> &#123;</span><br><span class="line">        <span class="attr">status</span>: <span class="title class_">Stationary</span> | <span class="literal">undefined</span></span><br><span class="line"></span><br><span class="line">        <span class="title function_">onData</span>(<span class="params">s: Stationary</span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">status</span> = s</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="title function_">getPropertyD</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">status</span>) <span class="keyword">return</span> <span class="literal">undefined</span></span><br><span class="line">            <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">status</span>.<span class="property">d</span> <span class="comment">// ok</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">abstract</span> <span class="title function_">work</span>(): <span class="built_in">void</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">ControllerV1</span> <span class="keyword">extends</span> <span class="title class_ inherited__">Controller</span> &#123;</span><br><span class="line">        <span class="title function_">work</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">const</span> t = <span class="variable language_">this</span>.<span class="property">status</span> <span class="comment">// StationaryV1 | StationaryV2 | undefined, 需要区分 StationaryV1、StationaryV2</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> c = <span class="keyword">new</span> <span class="title class_">ControllerV1</span>()</span><br><span class="line">    <span class="keyword">const</span> d = c.<span class="title function_">getPropertyD</span>()  <span class="comment">// &#123; e: string; &#125; | &#123; f: number; &#125; | undefined</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> S2 &#123;</span><br><span class="line">    <span class="comment">// 使用泛型</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">Controller</span>&lt;T&gt; &#123;</span><br><span class="line">        <span class="attr">status</span>: T | <span class="literal">undefined</span></span><br><span class="line"></span><br><span class="line">        <span class="title function_">onData</span>(<span class="params">s: T</span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">status</span> = s</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">abstract</span> <span class="title function_">work</span>(): <span class="built_in">void</span></span><br><span class="line"></span><br><span class="line">        <span class="title function_">getPropertyD</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">status</span>) <span class="keyword">return</span> <span class="literal">undefined</span></span><br><span class="line">            <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">status</span>.<span class="property">d</span> <span class="comment">// error, 类型“T”上不存在属性“d”</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">ControllerV1</span> <span class="keyword">extends</span> <span class="title class_ inherited__">Controller</span>&lt;<span class="title class_">StationaryV1</span>&gt; &#123;</span><br><span class="line">        <span class="title function_">work</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">const</span> t = <span class="variable language_">this</span>.<span class="property">status</span> <span class="comment">// StationaryV1 | undefined, ok</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="用于类型"><a href="#用于类型" class="headerlink" title="用于类型"></a>用于类型</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/0.ts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Obj</span>&lt;<span class="title class_">One</span>, <span class="title class_">Second</span>&gt; = &#123; [<span class="attr">index</span>: <span class="built_in">string</span>]: [<span class="title class_">One</span>, <span class="title class_">Second</span>] &#125;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">T1</span> = <span class="title class_">Obj</span>&lt;<span class="built_in">string</span>, <span class="built_in">number</span>&gt; <span class="comment">// &#123; [index: string]: [string, number] &#125;</span></span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">T2</span> = <span class="title class_">Obj</span>&lt;<span class="built_in">string</span>[], <span class="built_in">number</span>[]&gt; <span class="comment">// &#123; [index: string]: [string[], number[]] &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">Producer</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="attr">shift</span>: <span class="function">() =&gt;</span> T | <span class="literal">undefined</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> consumeFirst&lt;T&gt;(<span class="attr">arg</span>: <span class="title class_">Producer</span>&lt;T&gt;) &#123;</span><br><span class="line">    <span class="keyword">const</span> first = arg.<span class="title function_">shift</span>()</span><br><span class="line">    <span class="comment">// do something with first</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">return</span> first</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> item1 = <span class="title function_">consumeFirst</span>([<span class="number">1</span>]) <span class="comment">// number | undefined</span></span><br><span class="line"><span class="keyword">const</span> item2 = consumeFirst&lt;<span class="built_in">number</span>&gt;(<span class="keyword">new</span> <span class="title class_">Queue1</span>()) <span class="comment">// number | undefined</span></span><br><span class="line"><span class="keyword">const</span> item3 = <span class="title function_">consumeFirst</span>(<span class="keyword">new</span> <span class="title class_">Queue1</span>&lt;<span class="built_in">number</span>&gt;()) <span class="comment">// number | undefined</span></span><br><span class="line"><span class="keyword">const</span> item4 = <span class="title function_">consumeFirst</span>(<span class="keyword">new</span> <span class="title class_">Queue1</span>()) <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ../src/0.ts</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 同时使用多个泛型</span></span><br><span class="line"><span class="keyword">function</span> tuple&lt;<span class="title class_">Ele</span>, K&gt;(<span class="attr">arg1</span>: <span class="title class_">Ele</span>[], <span class="attr">arg2</span>: K): [<span class="title class_">Ele</span>[], K] &#123;</span><br><span class="line">    <span class="keyword">return</span> [arg1, arg2]</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> output3 = <span class="title function_">tuple</span>([<span class="string">&quot;test&quot;</span>], <span class="number">1</span>)   <span class="comment">// [string[], number]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 给定默认值</span></span><br><span class="line"><span class="keyword">type</span> O&lt;<span class="title class_">One</span> = <span class="built_in">string</span>, <span class="title class_">Second</span> = <span class="built_in">number</span>&gt; = &#123; [<span class="attr">index</span>: <span class="built_in">string</span>]: [<span class="title class_">One</span>, <span class="title class_">Second</span>]&#125;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">T3</span> = O  <span class="comment">// &#123; [index: string]: [string, number] &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="泛型约束"><a href="#泛型约束" class="headerlink" title="泛型约束"></a>泛型约束</h2><p>使用 <code>extends</code> 关键词对泛型进行约束</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/0.ts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> F1 &#123;</span><br><span class="line">    <span class="comment">// 一个对外的函数，期望传入 &#123; [index: string]: any &#125; 这样一个对象</span></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">identityObj</span>(<span class="params">arg: &#123; [index: <span class="built_in">string</span>]: <span class="built_in">any</span> &#125;</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> arg</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> r1 = <span class="title function_">identityObj</span>(&#123; <span class="attr">a</span>: <span class="number">1</span> &#125;) <span class="comment">// &#123; [index: string]: any &#125;，无法获得更精确的类型</span></span><br><span class="line">    <span class="keyword">const</span> r2 = <span class="title function_">identityObj</span>(<span class="number">1</span>)   <span class="comment">// 类型“1”的参数不能赋给类型“&#123; [index: string]: any; &#125;”的参数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> F2 &#123;</span><br><span class="line">    <span class="comment">// 对参数进行约束</span></span><br><span class="line">    <span class="keyword">function</span> identityObj&lt;T <span class="keyword">extends</span> &#123; [<span class="attr">index</span>: <span class="built_in">string</span>]: <span class="built_in">any</span> &#125;&gt;(<span class="attr">arg</span>: T) &#123;</span><br><span class="line">        <span class="keyword">return</span> arg</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> r1 = <span class="title function_">identityObj</span>(&#123; <span class="attr">a</span>: <span class="number">1</span> &#125;) <span class="comment">// &#123; a: number &#125;</span></span><br><span class="line">    <span class="keyword">const</span> r2 = <span class="title function_">identityObj</span>(<span class="number">1</span>)   <span class="comment">// 类型“1”的参数不能赋给类型“&#123; [index: string]: any; &#125;”的参数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 类型参数相互约束</span></span><br><span class="line"><span class="keyword">function</span> getProperty&lt;T, K <span class="keyword">extends</span> keyof T&gt;(<span class="attr">obj</span>: T, <span class="attr">key</span>: K) &#123;</span><br><span class="line">    <span class="keyword">return</span> obj[key]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> x = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span>, <span class="attr">c</span>: <span class="number">3</span>, <span class="attr">d</span>: <span class="number">4</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">getProperty</span>(x, <span class="string">&quot;a&quot;</span>) <span class="comment">// okay</span></span><br><span class="line"><span class="title function_">getProperty</span>(x, <span class="string">&quot;m&quot;</span>) <span class="comment">// error: Argument of type &#x27;m&#x27; isn&#x27;t assignable to &#x27;a&#x27; | &#x27;b&#x27; | &#x27;c&#x27; | &#x27;d&#x27;.</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> S3 &#123;</span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">Controller</span>&lt;T <span class="keyword">extends</span> <span class="title class_">Stationary</span>&gt; &#123;</span><br><span class="line">        <span class="attr">status</span>: T | <span class="literal">undefined</span></span><br><span class="line">        <span class="title function_">onData</span>(<span class="params">s: T</span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">status</span> = s</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">abstract</span> <span class="title function_">work</span>(): <span class="built_in">void</span></span><br><span class="line"></span><br><span class="line">        <span class="title function_">getPropertyD</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">status</span>) <span class="keyword">return</span> <span class="literal">undefined</span></span><br><span class="line">            <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">status</span>.<span class="property">d</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="title function_">getPropertyDV2</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">status</span>) <span class="keyword">return</span> <span class="literal">undefined</span></span><br><span class="line">            <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">status</span>.<span class="property">d</span> <span class="keyword">as</span> T[<span class="string">&quot;d&quot;</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">ControllerV1</span> <span class="keyword">extends</span> <span class="title class_ inherited__">Controller</span>&lt;<span class="title class_">StationaryV1</span>&gt; &#123;</span><br><span class="line">        <span class="title function_">work</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">const</span> t = <span class="variable language_">this</span>.<span class="property">status</span> <span class="comment">// StationaryV1 | undefined, ok</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> v1 = <span class="keyword">new</span> <span class="title class_">ControllerV1</span>()</span><br><span class="line">    <span class="keyword">const</span> d1 = v1.<span class="title function_">getPropertyD</span>()  <span class="comment">// &#123; e: string; &#125; | &#123; f: number; &#125; | undefined</span></span><br><span class="line">    <span class="keyword">const</span> d2 = v1.<span class="title function_">getPropertyDV2</span>()  <span class="comment">// &#123; e: string; &#125; | undefined</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="高级类型"><a href="#高级类型" class="headerlink" title="高级类型"></a>高级类型</h2><h3 id="extends-条件类型"><a href="#extends-条件类型" class="headerlink" title="extends 条件类型"></a>extends 条件类型</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// T extends U ? X : Y</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">TypeName</span>&lt;T&gt; =</span><br><span class="line">    T <span class="keyword">extends</span> <span class="built_in">string</span> ? <span class="string">&quot;string&quot;</span> :</span><br><span class="line">    T <span class="keyword">extends</span> <span class="built_in">number</span> ? <span class="string">&quot;number&quot;</span> :</span><br><span class="line">    T <span class="keyword">extends</span> <span class="built_in">boolean</span> ? <span class="string">&quot;boolean&quot;</span> :</span><br><span class="line">    T <span class="keyword">extends</span> <span class="literal">undefined</span> ? <span class="string">&quot;undefined&quot;</span> :</span><br><span class="line">    T <span class="keyword">extends</span> <span class="title class_">Function</span> ? <span class="string">&quot;function&quot;</span> : <span class="string">&quot;other&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> test1 = <span class="title class_">TypeName</span>&lt;<span class="built_in">string</span>&gt;  <span class="comment">// &quot;string&quot;</span></span><br><span class="line"><span class="keyword">type</span> test2 = <span class="title class_">TypeName</span>&lt;<span class="string">&quot;a&quot;</span>&gt;  <span class="comment">// &quot;string&quot;</span></span><br><span class="line"><span class="keyword">type</span> test3 = <span class="title class_">TypeName</span>&lt;<span class="literal">true</span>&gt;  <span class="comment">// &quot;boolean&quot;</span></span><br><span class="line"><span class="keyword">type</span> test4 = <span class="title class_">TypeName</span>&lt;<span class="function">() =&gt;</span> <span class="built_in">void</span>&gt;  <span class="comment">// &quot;function&quot;</span></span><br><span class="line"><span class="keyword">type</span> test5 = <span class="title class_">TypeName</span>&lt;<span class="built_in">string</span>[]&gt;  <span class="comment">// &quot;other&quot;</span></span><br><span class="line"><span class="keyword">type</span> test6 = <span class="title class_">TypeName</span>&lt;<span class="built_in">string</span> | (<span class="function">() =&gt;</span> <span class="built_in">void</span>)&gt;  <span class="comment">// &quot;string&quot; | &quot;function&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="infer-条件推断"><a href="#infer-条件推断" class="headerlink" title="infer 条件推断"></a>infer 条件推断</h3><p>用于和 <code>extends</code> 配合从一种类型中提取需要的类型</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="title class_">StrIndexObjInfer</span>&lt;O&gt; =</span><br><span class="line">    O <span class="keyword">extends</span> &#123; [<span class="attr">index</span>: <span class="built_in">string</span>]: infer A &#125;</span><br><span class="line">    ? A             <span class="comment">// If true</span></span><br><span class="line">    : <span class="built_in">never</span>         <span class="comment">// If false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> test1  = <span class="title class_">StrIndexObjInfer</span>&lt;&#123; <span class="attr">a</span>: <span class="built_in">string</span> &#125;&gt; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> test2  = <span class="title class_">StrIndexObjInfer</span>&lt;<span class="built_in">string</span>&gt;        <span class="comment">// never</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">FunctionInfer</span>&lt;F&gt; =</span><br><span class="line">    F <span class="keyword">extends</span> (...<span class="attr">args</span>: infer A) =&gt; infer R</span><br><span class="line">    ? [A, R]        <span class="comment">// If true</span></span><br><span class="line">    : <span class="built_in">never</span>         <span class="comment">// If false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">fn01</span>  = (<span class="params">a: <span class="built_in">number</span>, b: <span class="built_in">any</span></span>) =&gt; <span class="literal">true</span></span><br><span class="line"><span class="keyword">type</span> test3 = <span class="title class_">FunctionInfer</span>&lt;<span class="keyword">typeof</span> fn01&gt; <span class="comment">// [[a: number, b: any], boolean]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">ArrayInfer</span>&lt;T&gt; =</span><br><span class="line">    T <span class="keyword">extends</span> (infer U)[]</span><br><span class="line">    ? U</span><br><span class="line">    : <span class="built_in">never</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> array = [<span class="number">0</span>, <span class="string">&#x27;data&#x27;</span>, <span class="number">1</span>, <span class="string">&#x27;data&#x27;</span>]</span><br><span class="line"><span class="keyword">type</span> test4 = <span class="title class_">ArrayInfer</span>&lt;<span class="keyword">typeof</span> array&gt; <span class="comment">// string | number</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="官方预设的一些工具类型"><a href="#官方预设的一些工具类型" class="headerlink" title="官方预设的一些工具类型"></a>官方预设的一些工具类型</h3><p><span class="exturl" data-url="aHR0cHM6Ly93d3cudHlwZXNjcmlwdGxhbmcub3JnL2RvY3MvaGFuZGJvb2svdXRpbGl0eS10eXBlcy5odG1s">typescript: utility-types<i class="fa fa-external-link-alt"></i></span></p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 所有属性变为可选</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Partial</span>&lt;T&gt; = &#123;</span><br><span class="line">    [P <span class="keyword">in</span> keyof T]?: T[P]</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">P1</span> = <span class="title class_">Partial</span>&lt;&#123; <span class="attr">a</span>: <span class="built_in">string</span> &#125;&gt; <span class="comment">// &#123; a?: string | undefined &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 可用于 client 中 filter 类型的参数</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Book</span> = &#123; <span class="attr">name</span>: <span class="built_in">string</span>, <span class="attr">price</span>: <span class="built_in">number</span>, <span class="attr">pages</span>: <span class="built_in">number</span> &#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getBooks</span>(<span class="params">params: Partial&lt;Book&gt;</span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有属性变为必选</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Required</span>&lt;T&gt; = &#123;</span><br><span class="line">    [P <span class="keyword">in</span> keyof T]?: T[P]</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">R1</span> = <span class="title class_">Required</span>&lt;&#123; a?: <span class="built_in">string</span> &#125;&gt; <span class="comment">// &#123; a: string &#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有属性变为只读</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Readonly</span>&lt;T&gt; = &#123;</span><br><span class="line">    <span class="keyword">readonly</span> [P <span class="keyword">in</span> keyof T]: T[P]</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">R2</span> = <span class="title class_">Readonly</span>&lt;&#123; <span class="attr">a</span>: <span class="built_in">string</span> &#125;&gt; <span class="comment">// &#123; readonly a: string &#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 可用于输出一个只读对象</span></span><br><span class="line"><span class="keyword">function</span> getReadonlyObj&lt;T <span class="keyword">extends</span> &#123;[<span class="attr">index</span>: <span class="built_in">string</span>]: <span class="built_in">any</span>&#125;&gt;(<span class="attr">params</span>: T) &#123;</span><br><span class="line">    <span class="comment">// do something to params</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">return</span> params <span class="keyword">as</span> <span class="title class_">Readonly</span>&lt;T&gt;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> readonlyObj1 = <span class="title function_">getReadonlyObj</span>(&#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: &#123; <span class="attr">c</span>: <span class="string">&quot;yes&quot;</span> &#125; &#125;)</span><br><span class="line">readonlyObj1.<span class="property">a</span> = <span class="number">2</span>  <span class="comment">// Cannot assign to &#x27;a&#x27; because it is a read-only property.</span></span><br><span class="line">readonlyObj1.<span class="property">b</span>.<span class="property">c</span> = <span class="string">&quot;no&quot;</span> <span class="comment">// 对深层次属性无效</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> readonlyObj2 = <span class="title function_">getReadonlyObj</span>([<span class="number">1</span>, [<span class="number">2</span>, <span class="number">3</span>]])</span><br><span class="line">readonlyObj2[<span class="number">0</span>] = <span class="number">3</span> <span class="comment">// 类型“readonly (number | number[])[]”中的索引签名仅允许读取</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 提取 T 中部分的属性</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Pick</span>&lt;T, K <span class="keyword">extends</span> keyof T&gt; = &#123;</span><br><span class="line">    [P <span class="keyword">in</span> K]: T[P]</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">P2</span> = <span class="title class_">Pick</span>&lt;&#123; <span class="attr">a</span>: <span class="built_in">string</span>, <span class="attr">b</span>: <span class="built_in">number</span>, <span class="attr">c</span>: <span class="literal">null</span> &#125;, <span class="string">&quot;a&quot;</span> | <span class="string">&quot;b&quot;</span>&gt; <span class="comment">// &#123; a: string; b: number &#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 去掉 T 中部分的属性</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Omit</span>&lt;T, K <span class="keyword">extends</span> keyof <span class="built_in">any</span>&gt; = <span class="title class_">Pick</span>&lt;T, <span class="title class_">Exclude</span>&lt;keyof T, K&gt;&gt;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">O1</span> = <span class="title class_">Omit</span>&lt;&#123; <span class="attr">a</span>: <span class="built_in">string</span>, <span class="attr">b</span>: <span class="built_in">number</span>, <span class="attr">c</span>: <span class="literal">null</span> &#125;, <span class="string">&quot;a&quot;</span> | <span class="string">&quot;b&quot;</span>&gt; <span class="comment">// &#123; c: null &#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取 T 中不属于 U 的类型</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Exclude</span>&lt;T, U&gt; = T <span class="keyword">extends</span> U ? <span class="built_in">never</span> : T</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">E1</span> = <span class="title class_">Exclude</span>&lt;<span class="string">&quot;a&quot;</span> | <span class="string">&quot;b&quot;</span> | <span class="string">&quot;c&quot;</span> | <span class="string">&quot;d&quot;</span>, <span class="string">&quot;a&quot;</span> | <span class="string">&quot;c&quot;</span> | <span class="string">&quot;f&quot;</span>&gt;;  <span class="comment">// &quot;b&quot; | &quot;d&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取 T、U 公有的类型</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Extract</span>&lt;T, U&gt; = T <span class="keyword">extends</span> U ? T : <span class="built_in">never</span></span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">E2</span> = <span class="title class_">Extract</span>&lt;<span class="string">&quot;a&quot;</span> | <span class="string">&quot;b&quot;</span> | <span class="string">&quot;c&quot;</span> | <span class="string">&quot;d&quot;</span>, <span class="string">&quot;a&quot;</span> | <span class="string">&quot;c&quot;</span> | <span class="string">&quot;f&quot;</span>&gt;;  <span class="comment">// &quot;a&quot; | &quot;c&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 去掉 null, undefined</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">NonNullable</span>&lt;T&gt; = T <span class="keyword">extends</span> <span class="literal">null</span> | <span class="literal">undefined</span> ? <span class="built_in">never</span> : T</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">N1</span> = <span class="title class_">NonNullable</span>&lt;<span class="built_in">string</span> | <span class="built_in">number</span> | <span class="literal">undefined</span>&gt;;  <span class="comment">// string | number</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取函数参数类型</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">Parameters</span>&lt;T <span class="keyword">extends</span> (...<span class="attr">args</span>: <span class="built_in">any</span>) =&gt; <span class="built_in">any</span>&gt; = T <span class="keyword">extends</span> (...<span class="attr">args</span>: infer P) =&gt; <span class="built_in">any</span> ? P : <span class="built_in">never</span></span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">P3</span> = <span class="title class_">Parameters</span>&lt;<span class="function">(<span class="params">a: <span class="built_in">string</span>, b?: <span class="built_in">number</span></span>) =&gt;</span> <span class="built_in">void</span>&gt; <span class="comment">//  [a: string, b?: number | undefined]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">identity</span>(<span class="params">arg: <span class="built_in">string</span></span>): <span class="built_in">string</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">identity</span>(<span class="params">arg: <span class="built_in">number</span></span>): <span class="built_in">number</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">identity</span>(<span class="params">arg: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> arg</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">P4</span> = <span class="title class_">Parameters</span>&lt;<span class="keyword">typeof</span> identity&gt; <span class="comment">// [arg: number]，对签名重载的函数取最后一条</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取函数返回值类型</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">ReturnType</span>&lt;T <span class="keyword">extends</span> (...<span class="attr">args</span>: <span class="built_in">any</span>) =&gt; <span class="built_in">any</span>&gt; = T <span class="keyword">extends</span> (...<span class="attr">args</span>: <span class="built_in">any</span>) =&gt; infer R ? R : <span class="built_in">any</span></span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">R3</span> = <span class="title class_">ReturnType</span>&lt;<span class="function">() =&gt;</span> <span class="built_in">string</span>&gt; <span class="comment">// string</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 对 Promise 类型返回值去掉 Promise</span></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">ReturnTypeV2</span>&lt;T <span class="keyword">extends</span> (...<span class="attr">args</span>: <span class="built_in">any</span>) =&gt; <span class="built_in">any</span>&gt; = T <span class="keyword">extends</span> (...<span class="attr">args</span>: <span class="built_in">any</span>) =&gt; infer R ? R <span class="keyword">extends</span> <span class="title class_">Promise</span>&lt;infer S&gt; ? S : R : <span class="built_in">any</span></span><br><span class="line"><span class="keyword">type</span> <span class="variable constant_">R4</span> = <span class="title class_">ReturnTypeV2</span>&lt;<span class="function">() =&gt;</span> <span class="title class_">Promise</span>&lt;<span class="built_in">string</span>&gt;&gt; <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-04</div>
+      <div class="popular-posts-title"><a href="2020/12/04/TypeScript-泛型进阶篇/" rel="bookmark">TypeScript 泛型进阶篇</a></div>
+        <div class="popular-posts-excerpt"><p><p>介绍 TypeScript 泛型的进阶应用，核心是递归类型</p>
+<p>Github Repo 地址：<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeS90eXBlc2NyaXB0LWdlbmVyaWM=">https://github.com/ilyydy/typescript-generic<i class="fa fa-external-link-alt"></i></span></p></p></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/TypeScript/" rel="tag"><i class="fa fa-tag"></i> TypeScript</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/11/24/%E5%B9%B3%E9%9D%A2N%E7%82%B9%E6%B1%82%E5%85%B1%E7%BA%BF/" rel="prev" title="平面 n 点求共线">
+                  <i class="fa fa-chevron-left"></i> 平面 n 点求共线
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6%E7%AF%87/" rel="next" title="TypeScript 泛型进阶篇">
+                  TypeScript 泛型进阶篇 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9F%BA%E7%A1%80%E7%AF%87/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"f9047899bd12109b3c51f189da1fffa5"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

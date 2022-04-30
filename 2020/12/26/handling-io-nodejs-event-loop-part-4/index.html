@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="原文地址：Handling IO — NodeJS Event Loop Part 4, Deepal Jayasekara, Nov 26, 2017 系列上篇文章 （译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates 本篇文章中，我将详细讨论 NodeJS 如何处理 I&#x2F;O，深入探讨事件循环的实现以及 I&#x2F;O 如何">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（译文）NodeJS 事件循环（四）- Handling IO">
+<meta property="og:url" content="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="原文地址：Handling IO — NodeJS Event Loop Part 4, Deepal Jayasekara, Nov 26, 2017 系列上篇文章 （译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates 本篇文章中，我将详细讨论 NodeJS 如何处理 I&#x2F;O，深入探讨事件循环的实现以及 I&#x2F;O 如何">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilyydy.github.io/1.jpg">
+<meta property="og:image" content="https://ilyydy.github.io/2.NodeJS-Architecture.png">
+<meta property="og:image" content="https://ilyydy.github.io/3.all-Q.png">
+<meta property="og:image" content="https://ilyydy.github.io/4.Event-loop-and-JavaScript.jpg">
+<meta property="article:published_time" content="2020-12-26T08:24:18.000Z">
+<meta property="article:modified_time" content="2020-12-26T08:24:18.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="事件循环">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilyydy.github.io/1.jpg">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/","path":"2020/12/26/handling-io-nodejs-event-loop-part-4/","title":"（译文）NodeJS 事件循环（四）- Handling IO"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>（译文）NodeJS 事件循环（四）- Handling IO | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E6%AD%A5-I-x2F-O"><span class="nav-number">1.</span> <span class="nav-text">异步 I&#x2F;O</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Libuv-%E5%92%8C-NodeJS-I-x2F-O"><span class="nav-number">2.</span> <span class="nav-text">Libuv 和 NodeJS I&#x2F;O</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Check-Handlers"><span class="nav-number">3.</span> <span class="nav-text">Check Handlers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-x2F-O-Polling"><span class="nav-number">4.</span> <span class="nav-text">I&#x2F;O Polling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">5.</span> <span class="nav-text">关于线程池</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="（译文）NodeJS 事件循环（四）- Handling IO | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          （译文）NodeJS 事件循环（四）- Handling IO
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-26 16:24:18" itemprop="dateCreated datePublished" datetime="2020-12-26T16:24:18+08:00">2020-12-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">编程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/Node-js/" itemprop="url" rel="index"><span itemprop="name">Node.js</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>11 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2hhbmRsaW5nLWlvLW5vZGVqcy1ldmVudC1sb29wLXBhcnQtNC00MTgwNjJmOTE3ZDE=">Handling IO — NodeJS Event Loop Part 4, Deepal Jayasekara, Nov 26, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>系列上篇文章 <a href="/2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" title="（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates">（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates</a></p>
+<p>本篇文章中，我将详细讨论 NodeJS 如何处理 I&#x2F;O，深入探讨事件循环的实现以及 I&#x2F;O 如何与其他异步操作组合在一起。如果你尚未阅读本系列前面 3 篇文章，我建议你先看看它们，我在它们中探讨了 NodeJS 事件循环的其他许多概念。</p>
+<span id="more"></span>
+
+<h2 id="异步-I-x2F-O"><a href="#异步-I-x2F-O" class="headerlink" title="异步 I&#x2F;O"></a>异步 I&#x2F;O</h2><p>NodeJS 中我们反复谈到异步 I&#x2F;O。正如本系列第一篇文章提到的，I&#x2F;O 并不注定是同步的。</p>
+<p><img data-src="/1.jpg"></p>
+<p>所有操作系统实现中，它们都提供异步 I&#x2F;O 的事件通知接口（linux epoll, macOS kqueue，solaris event ports，windows IOCP 等）。NodeJS 利用这些系统级别的事件通知系统来提供非阻塞、异步 I&#x2F;O。</p>
+<p>如下图所见，NodeJS 是一系列工具的集合，它们聚合成高性能的 NodeJS 运行时。这些工具包括：</p>
+<ul>
+<li>Chrome v8 引擎 —— 高效执行 JavaScript</li>
+<li>Libuv —— 异步 I&#x2F;O 事件循环</li>
+<li>c-ares —— DNS 操作</li>
+<li>其他插件如 http-parser，crypto 和 zlib</li>
+</ul>
+<p><img data-src="/2.NodeJS-Architecture.png" alt="Node JS High-Level Architecture"></p>
+<p>这篇文章中我会讲解 Libuv 和它如何向 Node 提供异步 I&#x2F;O。让我们再回顾事件循环图示。</p>
+<p><img data-src="/3.all-Q.png" alt="The Event Loop in a nutshell"></p>
+<p>我们已经学到的事件循环知识有：</p>
+<ul>
+<li>事件循环从处理所有过时的定时器开始</li>
+<li>接着处理所有挂起的 I&#x2F;O 操作，可能会等待挂起的 I&#x2F;O 变为完成</li>
+<li>然后处理 setImmediate 回调</li>
+<li>最后处理 I&#x2F;O close 的处理器</li>
+<li>上述每个阶段间，libuv 会把阶段的执行结果通知 Node 架构的更上层部分，也就是 JavaScript。每次通知发生时，<code>process.nextTick</code> 回调和其他微任务回调就会被执行。</li>
+</ul>
+<p>现在，让我们理解 NodeJS 在事件循环中如何处理 I&#x2F;O。</p>
+<blockquote>
+<p>什么是 I&#x2F;O？</p>
+<p>一般地，涉及到除 CPU 以外的外部设备的工作都可被称为 I&#x2F;O。最常见的抽象 I&#x2F;O 类型有文件操作和 TCP&#x2F;UDP 网络操作。</p>
+</blockquote>
+<h2 id="Libuv-和-NodeJS-I-x2F-O"><a href="#Libuv-和-NodeJS-I-x2F-O" class="headerlink" title="Libuv 和 NodeJS I&#x2F;O"></a>Libuv 和 NodeJS I&#x2F;O</h2><p>JavaScript 本身没有能力实现异步 I&#x2F;O 操作。NodeJS 开发过程中，libuv 最初是为了给 Node 提供异步 I&#x2F;O。libuv 现在已经是一个独立的库，可独立被使用。Libuv 在 NodeJS 架构中的角色是抽象和屏蔽内部 I&#x2F;O 复杂度，给上层的 Node 提供通用的接口，让 Node 具有跨平台的异步 I&#x2F;O 能力。</p>
+<blockquote>
+<p>警示！</p>
+<p>如果你对事件循环没有基本的概念，我建议你先阅读本系列之前的文章。为了集中讲述 I&#x2F;O，我会省略一些细节。</p>
+<p>我会使用 libuv 一些源码片段。为了更简易，我只会举 Unix 平台的样例，Windows 平台虽然会有些不同，但相差应该不会太大。</p>
+<p>我假定你对 C 有一定了解。不用太熟练，但需要能理解基本的流程。</p>
+</blockquote>
+<p>如 NodeJS 架构图所示，libuv 在架构中处于较底层的位置。现在，让我们看看 NodeJS 上层和 libuv 事件循环各阶段之间的关系。</p>
+<p><img data-src="/4.Event-loop-and-JavaScript.jpg" alt="Event loop and JavaScript"></p>
+<p>图 “The Event Loop in a nutshell” 中事件循环存在 4 个可区分的阶段。但在 libuv 中其实存在 7 个可区分的阶段：</p>
+<ol>
+<li>Timers —— 执行过期的 <code>setTimeout</code> 和 <code>setInterval</code> 回调</li>
+<li>Pending I&#x2F;O callbacks —— 执行挂起的已完成或发生错误 I&#x2F;O 回调</li>
+<li>Idle handlers —— libuv 内部事务处理</li>
+<li>Prepare Handlers —— poll I&#x2F;O 前的准备工作</li>
+<li>I&#x2F;O Poll —— 可能等待任意的 I&#x2F;O 变为完成</li>
+<li>Check handlers —— poll I&#x2F;O 后的事后工作，一般是 <code>setImmediate</code> 回调</li>
+<li>Close handlers —— 所有关闭 I&#x2F;O 的处理器</li>
+</ol>
+<p>如果你还记得第一篇文章，你可能会疑惑：</p>
+<ol>
+<li>Check handlers 是什么？它在事件循环图中不存在。</li>
+<li>I&#x2F;O Polling 是什么？为什么要在执行已完成 I&#x2F;O 回调后阻塞 I&#x2F;O？Node 难道不是非阻塞的吗？</li>
+</ol>
+<p>让我们来解释这两个问题。</p>
+<h2 id="Check-Handlers"><a href="#Check-Handlers" class="headerlink" title="Check Handlers"></a>Check Handlers</h2><p>NodeJS 初始化时，它会把所有 <code>setImmediate</code> 回调注册为 libuv 的 Check handlers。这意味着你使用 <code>setImmediate</code> 传入的回调会增加在 Libuv 的 Check handlers 队列中。它保证了这些回调会在事件循环中的 I&#x2F;O 操作后被执行。</p>
+<h2 id="I-x2F-O-Polling"><a href="#I-x2F-O-Polling" class="headerlink" title="I&#x2F;O Polling"></a>I&#x2F;O Polling</h2><p>现在你应该在猜测 I&#x2F;O Polling 是什么。虽然我把 I&#x2F;O 回调队列和 I&#x2F;O Polling 合并为事件循环中的单一阶段，但实际上 I&#x2F;O Polling 发生在处理完已完成&#x2F;已错误的 I&#x2F;O 回调。</p>
+<p>关于 I&#x2F;O Polling 最重要的事实是<strong>它是可选的</strong>。I&#x2F;O Polling 是否发生取决于当时的具体情况。为了彻底地了解它，我们看看 libuv 中的实现代码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">r = uv__loop_alive(loop);</span><br><span class="line">  <span class="keyword">if</span> (!r)</span><br><span class="line">    uv__update_time(loop);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (r != <span class="number">0</span> &amp;&amp; loop-&gt;stop_flag == <span class="number">0</span>) &#123;</span><br><span class="line">    uv__update_time(loop);</span><br><span class="line">    uv__run_timers(loop);</span><br><span class="line">    ran_pending = uv__run_pending(loop);</span><br><span class="line">    uv__run_idle(loop);</span><br><span class="line">    uv__run_prepare(loop);</span><br><span class="line"></span><br><span class="line">    timeout = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ((mode == UV_RUN_ONCE &amp;&amp; !ran_pending) || mode == UV_RUN_DEFAULT)</span><br><span class="line">      timeout = uv_backend_timeout(loop);</span><br><span class="line"></span><br><span class="line">    uv__io_poll(loop, timeout);</span><br><span class="line">    uv__run_check(loop);</span><br><span class="line">    uv__run_closing_handles(loop);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mode == UV_RUN_ONCE) &#123;</span><br><span class="line">      uv__update_time(loop);</span><br><span class="line">      uv__run_timers(loop);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    r = uv__loop_alive(loop);</span><br><span class="line">    <span class="keyword">if</span> (mode == UV_RUN_ONCE || mode == UV_RUN_NOWAIT)</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对不熟悉 C 的人这段代码可能会人头痛。让我们尝试找到它的精髓而不过分关注细节。它来自于 libuv 源码的 <code>core.c</code> 文件的 <code>uv_run</code> 方法。但最重要的是，它是<strong>NodeJS 事件循环的核心</strong>。</p>
+<p>让我们再看看图”Event loop and JavaScript”，它与代码可以对应起来。让我们一行行来解释代码：</p>
+<ol>
+<li><code>uv__loop_alive</code> —— 检查是否有待调用的被引用的处理器，或是否有活跃的挂起操作</li>
+<li><code>uv__update_time</code> —— 发起系统调用获得当前时间，更新循环的时间（用于判断过期的计时器）</li>
+<li><code>uv__run_timers</code> —— 运行所有过期的计时器</li>
+<li><code>uv__run_pending</code> —— 运行所有已完成&#x2F;已错误的 I&#x2F;O 回调</li>
+<li><code>uv__io_poll</code> —— Poll for I&#x2F;O</li>
+<li><code>uv__run_check</code> —— 运行所有 check handlers（<code>setImmediate</code> 回调在此）</li>
+<li><code>uv__run_closing_handles</code> —— 运行所有关闭处理器</li>
+</ol>
+<p>首先，事件循环通过调用 <code>uv__loop_alive</code> 函数检查事件循环是否依然存活。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">uv__loop_alive</span><span class="params">(<span class="type">const</span> <span class="type">uv_loop_t</span>* loop)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> uv__has_active_handles(loop) ||</span><br><span class="line">         uv__has_active_reqs(loop) ||</span><br><span class="line">         loop-&gt;closing_handles != <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>uv__loop_alive</code> 函数返回 boolean 值。当满足以下条件时返回 <code>true</code>：</p>
+<ol>
+<li>存在待调用的活跃处理器</li>
+<li>存在挂起的活跃请求或操作</li>
+<li>存在待调用的关闭中的处理器</li>
+</ol>
+<p>只要 <code>uv__loop_alive</code> 返回 <code>true</code>，事件循环就会一直循环运行。</p>
+<p>运行完所有过期定时器的回调后，<code>uv__run_pending</code> 会被调用。它会处理 libuv 储存所有已完成 I&#x2F;O 操作的 <code>pending_queue</code>。如果 <code>pending_queue</code> 为空，<code>uv__run_pending</code> 返回 0，否则执行队列中所有回调并返回 1。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">uv__run_pending</span><span class="params">(<span class="type">uv_loop_t</span>* loop)</span> &#123;</span><br><span class="line">  QUEUE* q;</span><br><span class="line">  QUEUE pq;</span><br><span class="line">  <span class="type">uv__io_t</span>* w;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (QUEUE_EMPTY(&amp;loop-&gt;pending_queue))</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  QUEUE_MOVE(&amp;loop-&gt;pending_queue, &amp;pq);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (!QUEUE_EMPTY(&amp;pq)) &#123;</span><br><span class="line">    q = QUEUE_HEAD(&amp;pq);</span><br><span class="line">    QUEUE_REMOVE(q);</span><br><span class="line">    QUEUE_INIT(q);</span><br><span class="line">    w = QUEUE_DATA(q, <span class="type">uv__io_t</span>, pending_queue);</span><br><span class="line">    w-&gt;cb(loop, w, POLLOUT);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在让我们看看 libuv <code>uv__io_poll</code> 函数实现的 I&#x2F;O Polling。</p>
+<p><code>uv__io_poll</code> 第二个参数是 <code>uv_backend_timeout</code> 计算出的超时时间。<code>uv__io_poll</code> 利用这一参数决定应该阻塞 I&#x2F;O 多长。如果超时时间为 0，I&#x2F;O polling 会被跳过，事件循环移动到 check handlers（<code>setImmediate</code>）阶段。什么决定 <code>timeout</code> 的值是很有趣的部分。根据之前 <code>uv_run</code> 的代码，我们可以推导出以下流程：</p>
+<ol>
+<li>如果事件循环以 <code>UV_RUN_DEFAULT</code> 模式运行，<code>timeout</code> 根据 <code>uv_backend_timeout</code> 方法计算得出</li>
+<li>如果事件循环以 <code>UV_RUN_ONCE</code> 模式运行，并且 <code>uv_run_pending</code> 返回 0（例如 <code>pending_queue</code> 为空的情况），<code>timeout</code> 根据 <code>uv_backend_timeout</code> 方法计算得出</li>
+<li>以上两种都不是则 <code>timeout</code> 为 <code>0</code></li>
+</ol>
+<blockquote>
+<p>不需要太过关注事件循环的不同模式比如 <code>UV_RUN_DEFAULT</code> 和 <code>UV_RUN_ONCE</code>，如果你真的有兴趣，看<span class="exturl" data-url="aHR0cDovL2RvY3MubGlidXYub3JnL2VuL3YxLngvbG9vcC5odG1s">这里<i class="fa fa-external-link-alt"></i></span></p>
+</blockquote>
+<p>让我们看看 <code>uv_backend_timeout</code> 代码，理解 <code>timeout</code> 是如何计算得出的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">uv_backend_timeout</span><span class="params">(<span class="type">const</span> <span class="type">uv_loop_t</span>* loop)</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (loop-&gt;stop_flag != <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!uv__has_active_handles(loop) &amp;&amp; !uv__has_active_reqs(loop))</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!QUEUE_EMPTY(&amp;loop-&gt;idle_handles))</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!QUEUE_EMPTY(&amp;loop-&gt;pending_queue))</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (loop-&gt;closing_handles)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> uv__next_timeout(loop);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果 <code>stop_flag</code> 被设置，意味着事件循环将要退出，超时时间为 <code>0</code>。</li>
+<li>如果没有活跃的 handles 和活跃的挂起状态的操作，不需要等待，因此超时时间为 <code>0</code>。</li>
+<li>如果有待执行的挂起状态的空闲 handles，不等待 I&#x2F;0，因此超时时间为 <code>0</code>。</li>
+<li>如果 <code>pending_queue</code> 中有已完成的 I&#x2F;O handlers，也不应该等待 I&#x2F;O，因此超时时间为 <code>0</code>。</li>
+<li>如果存在挂起待执行的 close handlers，也不应该等待 I&#x2F;O，因此超时时间为 <code>0</code>。</li>
+</ul>
+<p>如果以上条件都不满足，<code>uv__next_timeout</code> 被调用来决定 libuv 应该为 I&#x2F;O 等待多长。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">uv__next_timeout</span><span class="params">(<span class="type">const</span> <span class="type">uv_loop_t</span>* loop)</span> &#123;</span><br><span class="line">  <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">heap_node</span>* <span class="title">heap_node</span>;</span></span><br><span class="line">  <span class="type">const</span> <span class="type">uv_timer_t</span>* handle;</span><br><span class="line">  <span class="type">uint64_t</span> diff;</span><br><span class="line"></span><br><span class="line">  heap_node = heap_min((<span class="type">const</span> <span class="keyword">struct</span> heap*) &amp;loop-&gt;timer_heap);</span><br><span class="line">  <span class="keyword">if</span> (heap_node == <span class="literal">NULL</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>; <span class="comment">/* block indefinitely */</span></span><br><span class="line"></span><br><span class="line">  handle = container_of(heap_node, <span class="type">uv_timer_t</span>, heap_node);</span><br><span class="line">  <span class="keyword">if</span> (handle-&gt;timeout &lt;= loop-&gt;time)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  diff = handle-&gt;timeout - loop-&gt;time;</span><br><span class="line">  <span class="keyword">if</span> (diff &gt; INT_MAX)</span><br><span class="line">    diff = INT_MAX;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> diff;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>uv__next_timeout</code> 负责返回离当前最近的定时器的值。如果没有，返回 <code>-1</code>，也就意味这无限。</p>
+<p>现在你应该对问题“为什么要在执行已完成 I&#x2F;O 回调后阻塞 I&#x2F;O？Node 难道不是非阻塞的吗？”有答案了。</p>
+<p>事件循环在存在待执行的挂起任务时不会阻塞，但如果不存在，循环就会一直阻塞直到有过期的定时器重新激活循环。</p>
+<blockquote>
+<p>我希望你还跟得上，虽然这些内容可能过于详细和细节。为了更好地理解事件循环，对底层机理的深入了解是很必要的。</p>
+</blockquote>
+<p>现在我们知道循环会等待多久 I&#x2F;O 变为已完成。<code>timeout</code> 被传入 <code>uv__io_poll</code>，<code>uv__io_poll</code> 一直等待进来的 I&#x2F;O 操作，直到达到超时时间或系统设置的最大安全超时时间。超时后，循环会激活，移动到 check handlers 阶段。</p>
+<p>I&#x2F;O Polling 在不同的操作系统有不同的实现。Linux 中使用系统内核调用方法 <code>epoll_wait</code>，macOS 使用 <code>kqueue</code>，Windows 使用 IOCP(Input Output Completion Port) 中的 <code>GetQueuedCompletionStatus</code>。我不会具体探讨 I&#x2F;O Polling 如何工作，因为这个话题很复杂，至少要另外一个系列才能解释清楚（我不认为我会写）。</p>
+<h2 id="关于线程池"><a href="#关于线程池" class="headerlink" title="关于线程池"></a>关于线程池</h2><p>这篇文章还没有谈到线程池。正如我们在本系统第一篇文章中提到的，线程池主要用来处理所有的文件 I&#x2F;O 操作，DNS 操作中的 <code>getaddrinfo</code> 和 <code>getnameinfo</code> 调用，因为不同操作系统文件 I&#x2F;O 的复杂性（对这个问题复杂度的确切分析看<span class="exturl" data-url="aHR0cDovL2Jsb2cubGlidG9ycmVudC5vcmcvMjAxMi8xMC9hc3luY2hyb25vdXMtZGlzay1pby8=">这里<i class="fa fa-external-link-alt"></i></span>）。因为线程池的大小是有限的（默认为 4），多个对文件系统的操作请求还是可能会被阻塞直到至少一个线程空闲可用。为了增加服务应用的性能，可通过环境变量 <code>UV_THREADPOOL_SIZE</code> 可将线程池的大小最大设为 128（截止这篇文章的时间）</p>
+<p>但是线程池固定大小的限制仍然是 NodeJS 应用的一大瓶颈，因为线程池不仅仅只负责文件 I&#x2F;O，<code>getaddrinfo</code> 和 <code>getnameinfo</code>。一些特定 CPU 密集计算型的操作如加解密操作如 <code>randomBytes</code>, <code>randomFill</code> 和 <code>pbkdf2</code> 为了避免对应用的性能造成损害，也会在 libuv 线程池中运行。但这也可能导致线程成为 I&#x2F;O 操作所需的稀缺资源。</p>
+<p>上一版 libuv 增强提案中有一点就是建议让线程池的大小可根据负载进行伸缩扩展。但是这项提案最终被<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2xpYnV2L2xlcHMvYmxvYi9tYXN0ZXIvMDA0LXRocmVhZHBvb2wtaGFuZGxlLm1k">撤回<i class="fa fa-external-link-alt"></i></span>，取而戴之的是未来会引入的一个关于线程的插件式 API，</p>
+<p>本篇文章的一些内容受 Saúl Ibarra Corretgé 2016 年在 NodeConfEU 的演讲启发。如果你想更多了解 libuv，我强烈建议你观看这一<span class="exturl" data-url="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1zR1RSbVBpWEQ0WSZmZWF0dXJlPXlvdXR1LmJl">演讲视频<i class="fa fa-external-link-alt"></i></span>。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" rel="bookmark">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYW5kLXRoZS1iaWctcGljdHVyZS1ub2RlanMtZXZlbnQtbG9vcC1wYXJ0LTEtMWNiNjdhMTgyODEw">Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”。这句话究竟意味着什么？“非阻塞”和“事件驱动”是什么意思？所有这些问题的答案涉及到 NodeJs 的核心，事件循环。在这个系列中，我会阐释什么是事件循环，它是如何工作的，它如何影响我们的应用，如何有效使用等等。在这篇文章中，我将讲解 NodeJs 如何工作，如何访问 I&#x2F;O，如何跨平台工作等等。</p></p></div>
+    </li>
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/" rel="bookmark">（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3RpbWVycy1pbW1lZGlhdGVzLWFuZC1wcm9jZXNzLW5leHR0aWNrLW5vZGVqcy1ldmVudC1sb29wLXBhcnQtMi0yYzUzZmQ1MTFiYjM=">Timers, Immediates and Process.nextTick— NodeJS Event Loop Part 2, Deepal Jayasekara, May 11, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>上篇文章 <a href="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" title="（译文）NodeJS 事件循环（一）- 事件循环机制概述">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a> 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates and process.nextTick 回调。</p></p></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"><i class="fa fa-tag"></i> Node.js</a>
+              <a href="/tags/%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/" rel="tag"><i class="fa fa-tag"></i> 事件循环</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" rel="prev" title="（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates">
+                  <i class="fa fa-chevron-left"></i> （译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/01/02/JS-collection/" rel="next" title="JS-collection">
+                  JS-collection <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"88d3c1ba8344be472b0e6244e7a83d91"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

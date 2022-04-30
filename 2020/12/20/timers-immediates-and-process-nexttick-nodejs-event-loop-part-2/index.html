@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="原文地址：Timers, Immediates and Process.nextTick— NodeJS Event Loop Part 2, Deepal Jayasekara, May 11, 2017 上篇文章 （译文）NodeJS 事件循环（一）- 事件循环机制概述 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick">
+<meta property="og:url" content="https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="原文地址：Timers, Immediates and Process.nextTick— NodeJS Event Loop Part 2, Deepal Jayasekara, May 11, 2017 上篇文章 （译文）NodeJS 事件循环（一）- 事件循环机制概述 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilyydy.github.io/1.all-Q.png">
+<meta property="article:published_time" content="2020-12-20T07:31:18.000Z">
+<meta property="article:modified_time" content="2020-12-20T07:32:18.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="事件循环">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilyydy.github.io/1.all-Q.png">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/","path":"2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/","title":"（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Next-Tick-Queue"><span class="nav-number">1.</span> <span class="nav-text">Next Tick Queue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Timers-queue"><span class="nav-number">2.</span> <span class="nav-text">Timers queue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Immediates-Queue"><span class="nav-number">2.1.</span> <span class="nav-text">Immediates Queue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setTimeout-vs-setImmediate"><span class="nav-number">3.</span> <span class="nav-text">setTimeout vs setImmediate ?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          （译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-12-20 15:31:18 / 修改时间：15:32:18" itemprop="dateCreated datePublished" datetime="2020-12-20T15:31:18+08:00">2020-12-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">编程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/Node-js/" itemprop="url" rel="index"><span itemprop="name">Node.js</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3RpbWVycy1pbW1lZGlhdGVzLWFuZC1wcm9jZXNzLW5leHR0aWNrLW5vZGVqcy1ldmVudC1sb29wLXBhcnQtMi0yYzUzZmQ1MTFiYjM=">Timers, Immediates and Process.nextTick— NodeJS Event Loop Part 2, Deepal Jayasekara, May 11, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>上篇文章 <a href="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" title="（译文）NodeJS 事件循环（一）- 事件循环机制概述">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a> 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates and process.nextTick 回调。</p>
+<span id="more"></span>
+
+<h2 id="Next-Tick-Queue"><a href="#Next-Tick-Queue" class="headerlink" title="Next Tick Queue"></a>Next Tick Queue</h2><p><img data-src="/1.all-Q.png"></p>
+<p>Next tick 队列与其他 4 个主要队列分隔开，是因为它不是 libuv 原生提供的，而是 Node 自己实现的。</p>
+<p>事件循环中要移动到一个阶段前（timers queue, IO events queue, immediates queue, close handlers queue 是 4 个主要的阶段），Node 会检查 <code>nextTick</code> 队列是否为空。如果不为空，Node 会一直处理该队列直到不为空。</p>
+<blockquote>
+<p>Node v11 引入了一些变化，导致巨大的行为差异。详细介绍见: <span class="exturl" data-url="aHR0cHM6Ly9tZWRpdW0uY29tL0BkcGpheWFzZWthcmEvbmV3LWNoYW5nZXMtdG8tdGltZXJzLWFuZC1taWNyb3Rhc2tzLWZyb20tbm9kZS12MTEtMC0wLWFuZC1hYm92ZS02OGQxMTI3NDNlYjM=">https://medium.com/@dpjayasekara/new-changes-to-timers-and-microtasks-from-node-v11-0-0-and-above-68d112743eb3<i class="fa fa-external-link-alt"></i></span></p>
+</blockquote>
+<p>这引入了一个问题：通过 <code>process.nextTick</code> 递归或重复添加事件到 <code>nextTick</code> 队列会导致 I&#x2F;O 和其他队列一直无法被处理。以下代码为例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">addNextTickRecurs</span>(<span class="params">count</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> self = <span class="variable language_">this</span>;</span><br><span class="line">    <span class="keyword">if</span> (self.<span class="property">id</span> === <span class="literal">undefined</span>) &#123;</span><br><span class="line">        self.<span class="property">id</span> = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (self.<span class="property">id</span> === count) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`process.nextTick call <span class="subst">$&#123;++self.id&#125;</span>`</span>);</span><br><span class="line">        addNextTickRecurs.<span class="title function_">call</span>(self, count);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">addNextTickRecurs</span>(<span class="title class_">Infinity</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="variable language_">console</span>.<span class="property">log</span>.<span class="title function_">bind</span>(<span class="variable language_">console</span>, <span class="string">&#x27;omg! setTimeout was called&#x27;</span>), <span class="number">10</span>);</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="variable language_">console</span>.<span class="property">log</span>.<span class="title function_">bind</span>(<span class="variable language_">console</span>, <span class="string">&#x27;omg! setImmediate also was called&#x27;</span>));</span><br><span class="line">fs.<span class="title function_">readFile</span>(__filename, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;omg! file read complete callback was called!&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;started&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>你将看到输出中没有 ‘omg!…’， 全是 <code>nextTick</code> 回调的无限循环，而 <code>setTimeout</code>, <code>setImmediate</code> 和 <code>fs.readFile</code> 回调永远不会被调用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">started</span><br><span class="line">process.nextTick call 1</span><br><span class="line">process.nextTick call 2</span><br><span class="line">process.nextTick call 3</span><br><span class="line">process.nextTick call 4</span><br><span class="line">process.nextTick call 5</span><br><span class="line">process.nextTick call 6</span><br><span class="line">process.nextTick call 7</span><br><span class="line">process.nextTick call 8</span><br><span class="line">process.nextTick call 9</span><br><span class="line">process.nextTick call 10</span><br><span class="line">process.nextTick call 11</span><br><span class="line">process.nextTick call 12</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+
+<p>当你把 <code>addNextTickRecurs</code> 的入参设为有限值时，你将在 <strong>process.nextTick call</strong> 的末尾看到<code>setTimeout</code>, <code>setImmediate</code> 和 <code>fs.readFile</code> 的回调输出。</p>
+<blockquote>
+<p>Node v0.12 之前, 有一个属性 <code>process.maxTickDepth</code> 用于限制 <code>process.nextTick</code> 队列的长度。当它被手动设置后，Node 一次只会处理 next tick queue 中不多于 <code>maxTickDepth</code> 的回调。但这个属性在 Node v0.12 中被移除。因此，在更新版本的 Node 中，应避免重复添加事件到 next tick queue。</p>
+</blockquote>
+<h2 id="Timers-queue"><a href="#Timers-queue" class="headerlink" title="Timers queue"></a>Timers queue</h2><p>当你使用 <code>setTimeout</code> 或 <code>setInterval</code> 时，Node 将会添加计时器到 libuv 的计时器堆。事件循环中轮到计时器阶段时，Node 将会检查计时器堆中过期的计时器，并按它们设置的先后顺序依次调用它们的回调。</p>
+<p>计时器<strong>并不能</strong>精确保证回调会在过期时间到时被执行。计时器回调的执行时机取决于操作系统（Node 必须在执行回调前检查计时器的过期时间，而这一过程会消耗一定的 CPU 时间）和事件循环中当前进程的表现。更准确地说，计时器保证的是回调不会在过期时间未到前被执行。我们可以用以下代码来模拟这种情况</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> start = process.<span class="title function_">hrtime</span>();</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> end = process.<span class="title function_">hrtime</span>(start);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`timeout callback executed after <span class="subst">$&#123;end[<span class="number">0</span>]&#125;</span>s and <span class="subst">$&#123;end[<span class="number">1</span>]/<span class="built_in">Math</span>.pow(<span class="number">10</span>,<span class="number">9</span>)&#125;</span>ms`</span>);</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>上述代码在程序开始时设置一个过期时间为 1 秒的计时器，并打印到实际执行回调用了多长时间。如果你多次运行这段代码，你将注意到它每次都会打印不同的结果，并且永远不会打印 <code>timeout callback executed after 1s and 0ms</code>。你将看到类似下面的结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">timeout callback executed after 1s and 0.006058353ms</span><br><span class="line">timeout callback executed after 1s and 0.004489878ms</span><br><span class="line">timeout callback executed after 1s and 0.004307132ms</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>这种时间过期的本质导致当 <code>setTimeout</code> 与 <code>setImmediate</code> 一起使用时会有意想不到的结果。我将在后面章节详细讲述。</p>
+<h3 id="Immediates-Queue"><a href="#Immediates-Queue" class="headerlink" title="Immediates Queue"></a>Immediates Queue</h3><p>虽然 immediates 队列和计时器过期的行为非常相似，但它有自己的特点。不像计时器我们无法保证它的回调什么时候被执行（即使把过期时间设为 0），immediates 队列保证了它会在事件循环的 I&#x2F;O 阶段后立即被处理。通过 <code>setImmediate</code> 可以向 immediates 队列添加事件。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">   <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hi, this is an immediate&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="setTimeout-vs-setImmediate"><a href="#setTimeout-vs-setImmediate" class="headerlink" title="setTimeout vs setImmediate ?"></a>setTimeout vs setImmediate ?</h2><p>让我们看看文章开头的事件循环图，你会看到当程序开始时 Node 从处理计时器队列开始，处理完 I&#x2F;O 后再轮到 immediates 队列。根据图上的逻辑，我们可以推测以下代码的输出。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setTimeout&#x27;</span>)</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setImmediate&#x27;</span>)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>你会推测上面的代码总是会先打印 <code>setTimeout</code> 再打印 <code>setImmediate</code>，因为过期计时器队列比 immediates 先处理。但实际这段代码无法保证这样的输出结果。你多次运行这段代码，会得到不同的输出结果。</p>
+<p>这是因为 NodeJS 为了对齐 <span class="exturl" data-url="aHR0cHM6Ly9jaHJvbWl1bS5nb29nbGVzb3VyY2UuY29tL2Nocm9taXVtL2JsaW5rLysvbWFzdGVyL1NvdXJjZS9jb3JlL2ZyYW1lL0RPTVRpbWVyLmNwcCM5Mw==">Chrome’s timers cap<i class="fa fa-external-link-alt"></i></span>，把最小过期时间定为 <code>1ms</code>。所以即使你把过期时间设为 <code>0ms</code>，会被覆盖为 <code>1ms</code>。</p>
+<blockquote>
+<p>如果你想知道更多这一点上 Node 和不同浏览器的行为差异，请看 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2phdmFzY3JpcHQtZXZlbnQtbG9vcC12cy1ub2RlLWpzLWV2ZW50LWxvb3AtYWVhMmIxYjg1ZjVj">javascript-event-loop-vs-node-js-event-loop<i class="fa fa-external-link-alt"></i></span></p>
+</blockquote>
+<p>每次新的事件循环开始时，NodeJS 通过系统调用获得当前时钟。根据 CPU 的繁忙情况，获取当前时钟的操作耗时可能不超过也可能超过 <code>1ms</code>。如果少于 <code>1ms</code>，NodeJS 将认为这个计时器还没过期，因为过期时间是 <code>1ms</code>，这时事件循环会移动到 I&#x2F;O 阶段再到 immediates 队列，然后发现队列中有一个事件并进行处理，也就意味着 <code>setImmediate</code> 比 <code>setTimeout</code> 先执行。但如果耗时超过 <code>1ms</code>，计时器就会被认为已过期，执行顺序结果相反。</p>
+<p>下面中代码保证了 immediate 一定会比计时器的先执行。</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">readFile</span>(__filename, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;timeout&#x27;</span>)</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">    <span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;immediate&#x27;</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>让我们看看上述代码的执行流程</p>
+<ol>
+<li>开始，程序异步读取文件，并提供一个处理文件读取完毕的回调。</li>
+<li>事件循环开始</li>
+<li>当文件读取完毕，执行回调作为一个事件添加到 I&#x2F;O 队列</li>
+<li>因为没有其他事件，Node 会一直等待 I&#x2F;O 事件，然后发现 I&#x2F;O 队列有一个事件，开始执行回调</li>
+<li>执行回调过程中，一个计时器添加到计时器堆，一个 immediate 添加到 immediate 队列</li>
+<li>现在事件循环正处在 I&#x2F;O 阶段，因为没有要处理的 I&#x2F;O 事件，事件循环会移动到 immediate 阶段，发现有一个 immediate 回调，然后 immediate 回调被执行</li>
+<li>下一轮事件循环发现有一个过期的计时器，然后执行计时器回调</li>
+</ol>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>看看事件循环中不同阶段&#x2F;队列如何一起工作，以下面的代码为例</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set immediate 1&#x27;</span>));</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set immediate 2&#x27;</span>));</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set immediate 3&#x27;</span>));</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set timeout 1&#x27;</span>), <span class="number">0</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set timeout 2&#x27;</span>);</span><br><span class="line">    process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is process.nextTick added inside setTimeout&#x27;</span>));</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set timeout 3&#x27;</span>), <span class="number">0</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set timeout 4&#x27;</span>), <span class="number">0</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is set timeout 5&#x27;</span>), <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is process.nextTick 1&#x27;</span>));</span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    process.<span class="title function_">nextTick</span>(<span class="variable language_">console</span>.<span class="property">log</span>.<span class="title function_">bind</span>(<span class="variable language_">console</span>, <span class="string">&#x27;this is the inner next tick inside next tick&#x27;</span>));</span><br><span class="line">&#125;);</span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is process.nextTick 2&#x27;</span>));</span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is process.nextTick 3&#x27;</span>));</span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;this is process.nextTick 4&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>执行上面的代码后，以下事件被添加到对应的事件循环队列</p>
+<ul>
+<li>3 immediates</li>
+<li>5 timer callbacks</li>
+<li>5 next tick callbacks</li>
+</ul>
+<p>执行流程是这样：</p>
+<ol>
+<li>事件循环开始，发现 next tick 队列不为空，开始处理 next tick callbacks。执行第二个 next tick callback 时一个新的 next tick callback 添加到队列末尾，并在最后被执行。</li>
+<li>执行计时器队列中过期的计时器。执行第二个计时器回调时，一个新的 next tick callback 添加到 next tick 队列。</li>
+<li>当所有过期计时器执行完，事件循环检查 next tick 队列有一个事件并执行。</li>
+<li>因为没有 I&#x2F;O 事件，事件循环移动到 immediates 阶段开始处理 immediates 队列。</li>
+</ol>
+<p>代码运行结果如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">this is process.nextTick 1</span><br><span class="line">this is process.nextTick 2</span><br><span class="line">this is process.nextTick 3</span><br><span class="line">this is process.nextTick 4</span><br><span class="line">this is the inner next tick inside next tick</span><br><span class="line">this is set timeout 1</span><br><span class="line">this is set timeout 2</span><br><span class="line">this is set timeout 3</span><br><span class="line">this is set timeout 4</span><br><span class="line">this is set timeout 5</span><br><span class="line">this is process.nextTick added inside setTimeout</span><br><span class="line">this is set immediate 1</span><br><span class="line">this is set immediate 2</span><br><span class="line">this is set immediate 3</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" rel="bookmark">（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3Byb21pc2VzLW5leHQtdGlja3MtYW5kLWltbWVkaWF0ZXMtbm9kZWpzLWV2ZW50LWxvb3AtcGFydC0zLTkyMjZjYmU3YTZhYQ==">Promises, Next-Ticks, and Immediates— NodeJS Event Loop Part 3, Deepal Jayasekara, Jul 22, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>系列上篇文章 <a href="/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/" title="（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick">（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick</a> 讲述了事件循环中的计时器，immediates 和每个队列如何按顺序执行。这篇文章将关注事件循环如何处理 resolved&#x2F;rejected promises (包括原生的 JS promises, Q promises, 和 Bluebird promises) 和 next tick 回调。如果你对 Promises 不熟悉，建议你先对 Promises 进行初步了解。</p></p></div>
+    </li>
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" rel="bookmark">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYW5kLXRoZS1iaWctcGljdHVyZS1ub2RlanMtZXZlbnQtbG9vcC1wYXJ0LTEtMWNiNjdhMTgyODEw">Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”。这句话究竟意味着什么？“非阻塞”和“事件驱动”是什么意思？所有这些问题的答案涉及到 NodeJs 的核心，事件循环。在这个系列中，我会阐释什么是事件循环，它是如何工作的，它如何影响我们的应用，如何有效使用等等。在这篇文章中，我将讲解 NodeJs 如何工作，如何访问 I&#x2F;O，如何跨平台工作等等。</p></p></div>
+    </li>
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-26</div>
+      <div class="popular-posts-title"><a href="2020/12/26/handling-io-nodejs-event-loop-part-4/" rel="bookmark">（译文）NodeJS 事件循环（四）- Handling IO</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2hhbmRsaW5nLWlvLW5vZGVqcy1ldmVudC1sb29wLXBhcnQtNC00MTgwNjJmOTE3ZDE=">Handling IO — NodeJS Event Loop Part 4, Deepal Jayasekara, Nov 26, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>系列上篇文章 <a href="/2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" title="（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates">（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates</a></p>
+<p>本篇文章中，我将详细讨论 NodeJS 如何处理 I&#x2F;O，深入探讨事件循环的实现以及 I&#x2F;O 如何与其他异步操作组合在一起。如果你尚未阅读本系列前面 3 篇文章，我建议你先看看它们，我在它们中探讨了 NodeJS 事件循环的其他许多概念。</p></p></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"><i class="fa fa-tag"></i> Node.js</a>
+              <a href="/tags/%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/" rel="tag"><i class="fa fa-tag"></i> 事件循环</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" rel="prev" title="（译文）NodeJS 事件循环（一）- 事件循环机制概述">
+                  <i class="fa fa-chevron-left"></i> （译文）NodeJS 事件循环（一）- 事件循环机制概述
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" rel="next" title="（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates">
+                  （译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"e18690dee5428530ba99ca447a23c7cc"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

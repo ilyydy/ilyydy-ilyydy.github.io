@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="给定平面 n 个离散点，找出所有至少 4 个点在线上的线段，若 p q r s t 按顺序共线，则只返回最长的线段 pt 或 tp，时间复杂度要求：(N^2)logN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="平面 n 点求共线">
+<meta property="og:url" content="https://ilyydy.github.io/2020/11/24/%E5%B9%B3%E9%9D%A2N%E7%82%B9%E6%B1%82%E5%85%B1%E7%BA%BF/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="给定平面 n 个离散点，找出所有至少 4 个点在线上的线段，若 p q r s t 按顺序共线，则只返回最长的线段 pt 或 tp，时间复杂度要求：(N^2)logN">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-11-24T13:43:14.000Z">
+<meta property="article:modified_time" content="2020-11-24T13:43:14.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="算法题">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2020/11/24/%E5%B9%B3%E9%9D%A2N%E7%82%B9%E6%B1%82%E5%85%B1%E7%BA%BF/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2020/11/24/%E5%B9%B3%E9%9D%A2N%E7%82%B9%E6%B1%82%E5%85%B1%E7%BA%BF/","path":"2020/11/24/平面N点求共线/","title":"平面 n 点求共线"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>平面 n 点求共线 | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#typescript-%E7%AE%80%E7%89%88%E4%BB%A3%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">typescript 简版代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#java-%E5%AE%8C%E5%85%A8%E7%89%88%E4%BB%A3%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">java 完全版代码</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2020/11/24/%E5%B9%B3%E9%9D%A2N%E7%82%B9%E6%B1%82%E5%85%B1%E7%BA%BF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="平面 n 点求共线 | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          平面 n 点求共线
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-24 21:43:14" itemprop="dateCreated datePublished" datetime="2020-11-24T21:43:14+08:00">2020-11-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%AE%97%E6%B3%95/%E9%A2%98%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">题目</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>14 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>给定平面 n 个离散点，找出所有至少 4 个点在线上的线段，若 p q r s t 按顺序共线，则只返回最长的线段 pt 或 tp，时间复杂度要求：(N^2)logN</p>
+<span id="more"></span>
+
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>n 个点中选中一个点 A1 作为原点，其他点按与 A1 的斜率排序，斜率相同的一组点则为共线点。得到一组共线点后需找出该线段的起始点，可通过横纵坐标比大小排序得出。n 个点如此循环操作一次即可得到所有线段。对于线段去重，考虑 A1，A2，A2，A3，A4 共线，设 A2 为线段起点，则这 4 个点分别作为原点时，都必然得到 A2 开始的线段，由此可得只对原点与线段起点相同的情况进行计数，则可以避免线段重复问题</p>
+<h2 id="typescript-简版代码"><a href="#typescript-简版代码" class="headerlink" title="typescript 简版代码"></a>typescript 简版代码</h2><p><span class="exturl" data-url="aHR0cHM6Ly93d3cuY291cnNlcmEub3JnL2xlYXJuL2FsZ29yaXRobXMtcGFydDEvcHJvZ3JhbW1pbmcvcHJYaVcvY29sbGluZWFyLXBvaW50cw==">coursera 算法课程习题<i class="fa fa-external-link-alt"></i></span></p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"><span class="keyword">private</span> x: <span class="built_in">number</span>, <span class="keyword">private</span> y: <span class="built_in">number</span></span>) &#123; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="title function_">isSameSlope</span>(<span class="params">slope: <span class="built_in">number</span>, currentSlope: <span class="built_in">number</span></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title class_">Math</span>.<span class="title function_">abs</span>(slope - currentSlope) &lt;= <span class="title class_">Math</span>.<span class="title function_">pow</span>(<span class="number">1</span>, -<span class="number">10</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="title function_">compare</span>(<span class="params">otherA: Point, otherB: Point</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> otherA.<span class="property">y</span> !== otherB.<span class="property">y</span></span><br><span class="line">            ? otherA.<span class="property">y</span> - otherB.<span class="property">y</span></span><br><span class="line">            : otherA.<span class="property">x</span> - otherB.<span class="property">x</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">isSame</span>(<span class="params">other: Point</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">x</span> === other.<span class="property">x</span> &amp;&amp; <span class="variable language_">this</span>.<span class="property">y</span> === other.<span class="property">y</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">slopeTo</span>(<span class="params">other: Point</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="title function_">isSame</span>(other)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="title class_">Number</span>.<span class="property">NEGATIVE_INFINITY</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">const</span> deltaX = other.<span class="property">x</span> - <span class="variable language_">this</span>.<span class="property">x</span></span><br><span class="line">        <span class="keyword">const</span> deltaY = other.<span class="property">y</span> - <span class="variable language_">this</span>.<span class="property">y</span></span><br><span class="line">        <span class="keyword">return</span> deltaX === <span class="number">0</span> ? <span class="title class_">Number</span>.<span class="property">POSITIVE_INFINITY</span> : deltaY / deltaX</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">comparator</span>(<span class="params">otherA: Point, otherB: Point</span>) &#123;</span><br><span class="line">        <span class="keyword">const</span> slopeA = <span class="variable language_">this</span>.<span class="title function_">slopeTo</span>(otherA)</span><br><span class="line">        <span class="keyword">const</span> slopeB = <span class="variable language_">this</span>.<span class="title function_">slopeTo</span>(otherB)</span><br><span class="line">        <span class="keyword">if</span> (!<span class="title class_">Point</span>.<span class="title function_">isSameSlope</span>(slopeA, slopeB)) <span class="keyword">return</span> slopeA - slopeB</span><br><span class="line">        <span class="keyword">return</span> otherA.<span class="property">y</span> !== otherB.<span class="property">y</span></span><br><span class="line">            ? otherA.<span class="property">y</span> - otherB.<span class="property">y</span></span><br><span class="line">            : otherA.<span class="property">x</span> - otherB.<span class="property">x</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LineSegment</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"><span class="keyword">private</span> p1: Point, <span class="keyword">private</span> p2: Point</span>) &#123; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">solve</span>(<span class="params">pointList: Point[]</span>) &#123;</span><br><span class="line">    <span class="comment">// 以下只考虑一般情况：pointList 长度大于等于 4，不存在重复点</span></span><br><span class="line">    <span class="keyword">const</span> minCollinearPointsNum = <span class="number">4</span></span><br><span class="line">    <span class="keyword">const</span> <span class="attr">lineSegment</span>: <span class="title class_">LineSegment</span>[] = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="attr">pointListCopy</span>: <span class="title class_">Point</span>[] = pointList.<span class="title function_">map</span>(<span class="function"><span class="params">e</span> =&gt;</span> e)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">handleCollinearPointGroup</span> = (<span class="params">startIndex: <span class="built_in">number</span>, endIndex: <span class="built_in">number</span>, startPoint: Point, pList: Point[]</span>) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (endIndex - startIndex &gt;= minCollinearPointsNum - <span class="number">2</span>) &#123;</span><br><span class="line">            lineSegment.<span class="title function_">push</span>(<span class="keyword">new</span> <span class="title class_">LineSegment</span>(startPoint, pList[endIndex]))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> point <span class="keyword">of</span> pointList) &#123;</span><br><span class="line">        pointListCopy.<span class="title function_">sort</span>(point.<span class="property">comparator</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> startIndex = <span class="number">1</span>  <span class="comment">// index 0 必定是 point 自身</span></span><br><span class="line">        <span class="keyword">let</span> endIndex = <span class="number">1</span></span><br><span class="line">        <span class="keyword">let</span> flag = <span class="literal">false</span></span><br><span class="line">        <span class="keyword">let</span> currentSlope = <span class="title class_">Number</span>.<span class="property">NEGATIVE_INFINITY</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> index = startIndex; index &lt; pointListCopy.<span class="property">length</span>; index++) &#123;</span><br><span class="line">            <span class="keyword">const</span> element = pointListCopy[index]</span><br><span class="line">            <span class="keyword">const</span> slope = point.<span class="title function_">slopeTo</span>(element)</span><br><span class="line">            <span class="keyword">if</span> (!<span class="title class_">Point</span>.<span class="title function_">isSameSlope</span>(slope, currentSlope)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (flag) <span class="title function_">handleCollinearPointGroup</span>(startIndex, endIndex, point, pointListCopy)</span><br><span class="line">                flag = <span class="title class_">Point</span>.<span class="title function_">compare</span>(point, element) &lt; <span class="number">0</span>  <span class="comment">// 除原点外的第一个点如果比原点大，则原点为线段起点</span></span><br><span class="line">                startIndex = index</span><br><span class="line">                endIndex = index</span><br><span class="line">                currentSlope = slope</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                endIndex++</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (flag) <span class="title function_">handleCollinearPointGroup</span>(startIndex, endIndex, point, pointListCopy)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> lineSegment <span class="keyword">as</span> <span class="keyword">readonly</span> <span class="title class_">LineSegment</span>[]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="java-完全版代码"><a href="#java-完全版代码" class="headerlink" title="java 完全版代码"></a>java 完全版代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Comparator;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Point</span> <span class="keyword">implements</span> <span class="title class_">Comparable</span>&lt;Point&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> x;     <span class="comment">// x-coordinate of this point</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> y;     <span class="comment">// y-coordinate of this point</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Initializes a new point.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  x the &lt;em&gt;x&lt;/em&gt;-coordinate of the point</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  y the &lt;em&gt;y&lt;/em&gt;-coordinate of the point</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Point</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">        <span class="comment">/* DO NOT MODIFY */</span></span><br><span class="line">        <span class="built_in">this</span>.x = x;</span><br><span class="line">        <span class="built_in">this</span>.y = y;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the slope between this point and the specified point.</span></span><br><span class="line"><span class="comment">     * Formally, if the two points are (x0, y0) and (x1, y1), then the slope</span></span><br><span class="line"><span class="comment">     * is (y1 - y0) / (x1 - x0). For completeness, the slope is defined to be</span></span><br><span class="line"><span class="comment">     * +0.0 if the line segment connecting the two points is horizontal;</span></span><br><span class="line"><span class="comment">     * Double.POSITIVE_INFINITY if the line segment is vertical;</span></span><br><span class="line"><span class="comment">     * and Double.NEGATIVE_INFINITY if (x0, y0) and (x1, y1) are equal.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  that the other point</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the slope between this point and the specified point</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> <span class="title function_">slopeTo</span><span class="params">(Point that)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">deltaX</span> <span class="operator">=</span> that.x - x;</span><br><span class="line">        <span class="type">int</span> <span class="variable">deltaY</span> <span class="operator">=</span> that.y - y;</span><br><span class="line">        <span class="keyword">if</span> (deltaX == <span class="number">0</span> &amp;&amp; deltaY == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> Double.NEGATIVE_INFINITY;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (deltaX == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> Double.POSITIVE_INFINITY;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (deltaY == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> +<span class="number">0.0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="type">double</span>) deltaY / deltaX;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Compares two points by y-coordinate, breaking ties by x-coordinate.</span></span><br><span class="line"><span class="comment">     * Formally, the invoking point (x0, y0) is less than the argument point</span></span><br><span class="line"><span class="comment">     * (x1, y1) if and only if either y0 &lt; y1 or if y0 = y1 and x0 &lt; x1.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  that the other point</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the value &lt;tt&gt;0&lt;/tt&gt; if this point is equal to the argument</span></span><br><span class="line"><span class="comment">     *         point (x0 = x1 and y0 = y1);</span></span><br><span class="line"><span class="comment">     *         a negative integer if this point is less than the argument</span></span><br><span class="line"><span class="comment">     *         point; and a positive integer if this point is greater than the</span></span><br><span class="line"><span class="comment">     *         argument point</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">compareTo</span><span class="params">(Point that)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (y &gt; that.y) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (y &lt; that.y) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">return</span> Integer.compare(x, that.x);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Compares two points by the slope they make with this point.</span></span><br><span class="line"><span class="comment">     * The slope is defined as in the slopeTo() method.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the Comparator that defines this ordering on points</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> Comparator&lt;Point&gt; <span class="title function_">slopeOrder</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (Point a, Point b) -&gt; &#123;</span><br><span class="line">            <span class="type">double</span> <span class="variable">slopA</span> <span class="operator">=</span> slopeTo(a);</span><br><span class="line">            <span class="type">double</span> <span class="variable">slopB</span> <span class="operator">=</span> slopeTo(b);</span><br><span class="line">            <span class="keyword">return</span> Double.compare(slopA, slopB);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns a string representation of this point.</span></span><br><span class="line"><span class="comment">     * This method is provide for debugging;</span></span><br><span class="line"><span class="comment">     * your program should not rely on the format of the string representation.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> a string representation of this point</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">/* DO NOT MODIFY */</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;(&quot;</span> + x + <span class="string">&quot;, &quot;</span> + y + <span class="string">&quot;)&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LineSegment</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Point p;   <span class="comment">// one endpoint of this line segment</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Point q;   <span class="comment">// the other endpoint of this line segment</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Initializes a new line segment.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  p one endpoint</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  q the other endpoint</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> NullPointerException if either &lt;tt&gt;p&lt;/tt&gt; or &lt;tt&gt;q&lt;/tt&gt;</span></span><br><span class="line"><span class="comment">     *         is &lt;tt&gt;null&lt;/tt&gt;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">LineSegment</span><span class="params">(Point p, Point q)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="literal">null</span> || q == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NullPointerException</span>(<span class="string">&quot;argument is null&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">this</span>.p = p;</span><br><span class="line">        <span class="built_in">this</span>.q = q;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns a string representation of this line segment</span></span><br><span class="line"><span class="comment">     * This method is provide for debugging;</span></span><br><span class="line"><span class="comment">     * your program should not rely on the format of the string representation.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> a string representation of this line segment</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> p + <span class="string">&quot; -&gt; &quot;</span> + q;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Throws an exception if called. The hashCode() method is not supported because</span></span><br><span class="line"><span class="comment">     * hashing has not yet been introduced in this course. Moreover, hashing does not</span></span><br><span class="line"><span class="comment">     * typically lead to good *worst-case* performance guarantees, as required on this</span></span><br><span class="line"><span class="comment">     * assignment.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> UnsupportedOperationException if called</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">UnsupportedOperationException</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.Comparator;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FastCollinearPoints</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> LineSegment[] result;</span><br><span class="line">    <span class="comment">// finds all line segments containing 4 or more points</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">FastCollinearPoints</span><span class="params">(Point[] points)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (points == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Point[] pointsCopy1 = points.clone();</span><br><span class="line">        Point[] pointsCopy2 = points.clone();</span><br><span class="line">        ArrayList&lt;LineSegment&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; pointsCopy1.length; i++) &#123;</span><br><span class="line">            <span class="type">Point</span> <span class="variable">p</span> <span class="operator">=</span> getPoint(pointsCopy1, i);</span><br><span class="line">            Arrays.sort(pointsCopy2, <span class="number">0</span>, pointsCopy2.length, FastCollinearPoints.slopeOrder(p));</span><br><span class="line">            <span class="type">int</span> <span class="variable">startIndex</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">            <span class="type">int</span> <span class="variable">endIndex</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">            <span class="type">double</span> <span class="variable">slope</span> <span class="operator">=</span> Double.NEGATIVE_INFINITY;</span><br><span class="line">            <span class="type">boolean</span> <span class="variable">flag</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> startIndex; j &lt; pointsCopy2.length; j++) &#123;</span><br><span class="line">                <span class="type">Point</span> <span class="variable">c</span> <span class="operator">=</span> getPoint(pointsCopy2, j);</span><br><span class="line">                <span class="type">double</span> <span class="variable">cSlope</span> <span class="operator">=</span> c.slopeTo(p);</span><br><span class="line">                <span class="keyword">if</span> (cSlope == Double.NEGATIVE_INFINITY) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (cSlope == slope) &#123;</span><br><span class="line">                    endIndex++;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (flag &amp;&amp; (endIndex - startIndex) &gt;= <span class="number">2</span>) &#123;</span><br><span class="line">                        <span class="type">LineSegment</span> <span class="variable">lineSegment</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LineSegment</span>(p, points[endIndex]);</span><br><span class="line">                        list.add(lineSegment);</span><br><span class="line">                    &#125;</span><br><span class="line">                    flag = c.compareTo(p) &gt; <span class="number">0</span>;</span><br><span class="line">                    startIndex = j;</span><br><span class="line">                    endIndex = j;</span><br><span class="line">                    slope = cSlope;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (flag &amp;&amp; (endIndex - startIndex) &gt;= <span class="number">2</span>) &#123;</span><br><span class="line">                <span class="type">LineSegment</span> <span class="variable">lineSegment</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LineSegment</span>(p, points[endIndex]);</span><br><span class="line">                list.add(lineSegment);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        result = <span class="keyword">new</span> <span class="title class_">LineSegment</span>[list.size()];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; list.size(); i++) &#123;</span><br><span class="line">            result[i] = list.get(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Comparator&lt;Point&gt; <span class="title function_">slopeOrder</span><span class="params">(Point p)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (Point a, Point b) -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (a == <span class="literal">null</span> || b == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>();</span><br><span class="line">            <span class="type">double</span> <span class="variable">slopA</span> <span class="operator">=</span> p.slopeTo(a);</span><br><span class="line">            <span class="type">double</span> <span class="variable">slopB</span> <span class="operator">=</span> p.slopeTo(b);</span><br><span class="line">            <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> Double.compare(slopA, slopB);</span><br><span class="line">            <span class="keyword">if</span> (res == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> a.compareTo(b);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> res;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Point <span class="title function_">getPoint</span><span class="params">(Point[] points, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">        <span class="type">Point</span> <span class="variable">p</span> <span class="operator">=</span> points[index];</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// the number of line segments</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">numberOfSegments</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> result.length;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// the line segments</span></span><br><span class="line">    <span class="keyword">public</span> LineSegment[] segments() &#123;</span><br><span class="line">        <span class="keyword">return</span> result.clone();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+      
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" rel="tag"><i class="fa fa-tag"></i> 算法题</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/11/23/Github-Hexo-Next-%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95%E6%91%98%E8%A6%81/" rel="prev" title="Github+Hexo+Next 搭建记录摘要">
+                  <i class="fa fa-chevron-left"></i> Github+Hexo+Next 搭建记录摘要
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/04/TypeScript-%E6%B3%9B%E5%9E%8B%E5%9F%BA%E7%A1%80%E7%AF%87/" rel="next" title="TypeScript 泛型基础篇">
+                  TypeScript 泛型基础篇 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2020/11/24/%E5%B9%B3%E9%9D%A2N%E7%82%B9%E6%B1%82%E5%85%B1%E7%BA%BF/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"a6a29266deee83effc3b0df1e449ceb8"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>

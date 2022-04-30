@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="原文地址：Event Loop Best Practices — NodeJS Event Loop Part 5, Deepal Jayasekara, Dec 29, 2017 事件循环这一系列文章到此已经讨论了事件循环和它不同的阶段，包括 setImmediate， nextTick 计时器以及上篇文章 （译文）NodeJS 事件循环（四）- Handling IO 的 I&#x2F;O。我">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（译文）NodeJS 事件循环（五）- 最佳实践">
+<meta property="og:url" content="https://ilyydy.github.io/2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="原文地址：Event Loop Best Practices — NodeJS Event Loop Part 5, Deepal Jayasekara, Dec 29, 2017 事件循环这一系列文章到此已经讨论了事件循环和它不同的阶段，包括 setImmediate， nextTick 计时器以及上篇文章 （译文）NodeJS 事件循环（四）- Handling IO 的 I&#x2F;O。我">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-02-28T09:00:14.000Z">
+<meta property="article:modified_time" content="2021-02-28T09:00:14.000Z">
+<meta property="article:author" content="张生">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/","path":"2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/","title":"（译文）NodeJS 事件循环（五）- 最佳实践"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>（译文）NodeJS 事件循环（五）- 最佳实践 | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E9%87%8D%E5%A4%8D%E8%B0%83%E7%94%A8%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%AD%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8%E5%90%8C%E6%AD%A5-I-x2F-O"><span class="nav-number">1.</span> <span class="nav-text">在重复调用代码块中避免使用同步 I&#x2F;O</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E8%A6%81%E4%B9%88%E5%AE%8C%E5%85%A8%E5%BC%82%E6%AD%A5%EF%BC%8C%E8%A6%81%E4%B9%88%E5%AE%8C%E5%85%A8%E5%90%8C%E6%AD%A5"><span class="nav-number">2.</span> <span class="nav-text">函数要么完全异步，要么完全同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%AA%E5%A4%9A-nextTicks"><span class="nav-number">3.</span> <span class="nav-text">太多 nextTicks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dns-lookup-vs-dns-resolve"><span class="nav-number">4.</span> <span class="nav-text">dns.lookup() vs dns.resolve*()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="nav-number">5.</span> <span class="nav-text">线程池的注意点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E7%9B%91%E6%8E%A7"><span class="nav-number">6.</span> <span class="nav-text">事件循环监控</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="（译文）NodeJS 事件循环（五）- 最佳实践 | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          （译文）NodeJS 事件循环（五）- 最佳实践
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-02-28 17:00:14" itemprop="dateCreated datePublished" datetime="2021-02-28T17:00:14+08:00">2021-02-28</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYmVzdC1wcmFjdGljZXMtbm9kZWpzLWV2ZW50LWxvb3AtcGFydC01LWUyOWIyYjUwYmZlMg==">Event Loop Best Practices — NodeJS Event Loop Part 5, Deepal Jayasekara, Dec 29, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>事件循环这一系列文章到此已经讨论了事件循环和它不同的阶段，包括 <code>setImmediate</code>， <code>nextTick</code> 计时器以及上篇文章 <a href="/2020/12/26/handling-io-nodejs-event-loop-part-4/" title="（译文）NodeJS 事件循环（四）- Handling IO">（译文）NodeJS 事件循环（四）- Handling IO</a> 的 I&#x2F;O。我相信你现在已经很好地理解 NodeJS 的事件循环。因此现在来谈谈最佳实践，怎样才能在开发 Node 应用时获得最好的结果和性能表现。</p>
+<p>大多数人因为不了解事件循环、错误处理和异步的相关概念（我在<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3lvdS1yZWFsbHktaGF0ZS1ub2RlLTU4YjFmZjcyMjAyZA==">这篇博客<i class="fa fa-external-link-alt"></i></span>中进行了详细讨论）而搞砸了他们最初的 NodeJS 应用。因为你已经理解了事件循环，我相信你或许已经知道而且能够理解我下面将要提到的最佳实践。现在让我们一起看看吧。</p>
+<span id="more"></span>
+
+<h2 id="在重复调用代码块中避免使用同步-I-x2F-O"><a href="#在重复调用代码块中避免使用同步-I-x2F-O" class="headerlink" title="在重复调用代码块中避免使用同步 I&#x2F;O"></a>在重复调用代码块中避免使用同步 I&#x2F;O</h2><p>在重复调用代码块如循环、经常被调用的函数中避免使用同步 I&#x2F;O（<code>fs.readFileSync</code>, <code>fs.renameSync</code> 等）。这会极大地削弱你应用的性能表现，因为每次执行同步 I&#x2F;O，事件循环都会被阻塞直到 I&#x2F;O 完成。使用这些同步方法最安全的之一途径是在应用启动时读取配置文件。</p>
+<h2 id="函数要么完全异步，要么完全同步"><a href="#函数要么完全异步，要么完全同步" class="headerlink" title="函数要么完全异步，要么完全同步"></a>函数要么完全异步，要么完全同步</h2><p>你的应用由许许多多函数组成。在 NodeJS 应用中，有两种类型的函数：</p>
+<ol>
+<li>同步函数 —— 大多数情况下使用 <code>return</code> 关键词返回输出（<code>Math</code> 函数，<code>fs.readFileSync</code> 等），或者使用 CPS（Continuation Passing Style 后续传递风格）来返回结果或执行操作（Array 原型方法如 <code>map</code> <code>filter</code> <code>reduce</code>）。</li>
+<li>异步函数 —— 用回调函数或 promise 来延迟返回结果（<code>fs.readFile</code> <code>dns.resolve</code>等）</li>
+</ol>
+<p>对函数的经验法则：</p>
+<ul>
+<li>完全同步 —— 所有输入和条件都是同步</li>
+<li>完全异步 ——— 所有输入和条件都是异步</li>
+</ul>
+<p>如果你的函数是以上两种混合体，或者对不同的输入和条件有不同的表现，这可能<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLml6cy5tZS8yMDEzLzA4L2Rlc2lnbmluZy1hcGlzLWZvci1hc3luY2hyb255">导致非预期的输出结果<i class="fa fa-external-link-alt"></i></span>。让我们看一个例子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> cache = &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">readFile</span>(<span class="params">fileName, callback</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (cache[fileName]) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">callback</span>(<span class="literal">null</span>, cache[fileName])</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fs.<span class="title function_">readFile</span>(fileName, <span class="function">(<span class="params">err, fileContent</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) <span class="keyword">return</span> <span class="title function_">callback</span>(err);</span><br><span class="line">        </span><br><span class="line">        cache[fileName] = fileContent;</span><br><span class="line">        <span class="title function_">callback</span>(<span class="literal">null</span>, fileContent);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">letsRead</span>(<span class="params"></span>)&#123;</span><br><span class="line">  <span class="title function_">readFile</span>(<span class="string">&#x27;myfile.txt&#x27;</span>, <span class="function">(<span class="params">err, result</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// error handler redacted</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;file read complete&#x27;</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;file read initiated&#x27;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果你的应用中在运行 <code>letsRead</code> 函数结束后再次运行，你会得到以下输出：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">file <span class="built_in">read</span> initiated</span><br><span class="line">file <span class="built_in">read</span> complete</span><br><span class="line"></span><br><span class="line">file <span class="built_in">read</span> complete</span><br><span class="line">file <span class="built_in">read</span> initiated</span><br></pre></td></tr></table></figure>
+
+<p>这中间发生了什么？</p>
+<p>你第一次运行 <code>letsRead</code> 时，<code>myfile.txt</code> 在 cache 中不存在，因此异步的 <code>fs.readFile</code> 将会被调用访问文件系统。这种情况下 <code>readFile</code> 异步执行，先打印 <code>file read initiated</code>。</p>
+<p>而第二次时，<code>myfile.txt</code> 已经在第一次时被读取存到 cache 中，因此不需要再访问文件系统，回调函数被立即同步执行。这种情况下，<code>readFile</code> 函数同步执行，<code>file read complete</code> 在 <code>file read initiated</code> 之前被打印。</p>
+<p>当你的应用变得复杂，这种同步、异步混合的函数会导致许多难以定位和修复的问题。因此，强烈推荐遵循以上的<strong>要么同步要么异步</strong>的法则。</p>
+<p>现在，如何修复上面的 <code>readFile</code> 函数呢，我们有两种方法：</p>
+<p>方法 1：使用 <code>fs.readFileSync</code> 让 <code>readFile</code> 变成完全的同步函数<br>方法 2：异步调用回调函数让 <code>readFile</code> 变成完全的异步函数</p>
+<p>如上面所说，我们知道在重复代码块中异步调用函数是更好的。因此，我们不应该使用方法 1，它会带来显著的性能损失。那么我们如何实现方法 2，异步调用回调函数呢？很简单，使用 <code>process.nextTick</code>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> cache = &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">readFile</span>(<span class="params">fileName, callback</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (cache[fileName]) &#123;</span><br><span class="line">        <span class="keyword">return</span> process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="title function_">callback</span>(<span class="literal">null</span>, cache[fileName]));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fs.<span class="title function_">readFile</span>(fileName, <span class="function">(<span class="params">err, fileContent</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) <span class="keyword">return</span> <span class="title function_">callback</span>(err);</span><br><span class="line">        </span><br><span class="line">        cache[fileName] = fileContent;</span><br><span class="line">        <span class="title function_">callback</span>(<span class="literal">null</span>, fileContent);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>process.nextTick</code> 会延迟回调函数的执行。现在，如果你运行 <code>letsRead</code> 连续运行函数两次，你会得到以下结果：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">file <span class="built_in">read</span> initiated</span><br><span class="line">file <span class="built_in">read</span> complete</span><br><span class="line"></span><br><span class="line">file <span class="built_in">read</span> initiated</span><br><span class="line">file <span class="built_in">read</span> complete</span><br></pre></td></tr></table></figure>
+
+<p>你也可以用 <code>setImmediate</code> 来达到相同的效果，但我更倾向用 <code>process.nextTick</code>，因为 nextTick 队列比 immediates 队列更频繁被处理。</p>
+<h2 id="太多-nextTicks"><a href="#太多-nextTicks" class="headerlink" title="太多 nextTicks"></a>太多 nextTicks</h2><p>虽然 <code>process.nextTick</code> 在很多情况下有用，但递归调用它会导致 I&#x2F;O 饿死。</p>
+<p>0.10 及更早版本的 NodeJS 提供了 <code>process.maxTickDepth</code> 来设置 nextTick 回调最大深度，但是这个参数在 0.12 版本的 NodeJS 中随 <code>setImmediate</code> 的引入而被移除。因此现在没有一种方法能限制 nextTicks 饿死 I&#x2F;O。</p>
+<h2 id="dns-lookup-vs-dns-resolve"><a href="#dns-lookup-vs-dns-resolve" class="headerlink" title="dns.lookup() vs dns.resolve*()"></a>dns.lookup() vs dns.resolve*()</h2><p>如果你看了 NodeJS 的 dns 模块文档，你会发现 dns 模块中有两种解析域名为 IP 地址的途径。一种是 <code>dns.lookup</code>，另一种是 <code>dns.resolve4</code> <code>dns.resolve6</code> 等。虽然这两种途径看起来效果一样，但它们底层有着显著的区别。</p>
+<p><code>dns.lookup</code> 和 <code>ping</code> 解析域名的原理类似。它调用操作系统的网络 API <code>getaddrinfo</code>。不幸的是，这个调用不是异步的。因此，为了模仿异步行为，调用在 libuv 的线程池中调用 <code>uv_getaddrinfo</code> 方法。这会和线程池中其他任务争抢资源，导致应用的性能损失。重要的是，libuv 线程池默认只有 4  个线程。因此，4 个并行的 <code>dns.lookup</code> 调用会完全占用线程池，无法处理其他请求（文件 I&#x2F;O，一些加解密方法，可能更多的 dns 查询）。</p>
+<p>相反，<code>dns.resolve()</code> 和其他的 <code>dns.resolve*()</code> 已另一种方式运行。以下是官方文档中对 <code>dns.resolve*</code> 的描述：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">These <span class="built_in">functions</span> are implemented quite differently than dns.lookup(). They <span class="keyword">do</span> not use getaddrinfo(3) and they always perform a DNS query on the network. This network communication is always <span class="keyword">done</span> asynchronously, and does not use libuv<span class="string">&#x27;s threadpool.</span></span><br></pre></td></tr></table></figure>
+
+<p>NodeJS 使用一个流行库 <a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/c-ares/c-ares"><code>c-ares</code></a> 来提供 DNS 解析能力。这个库不依赖 libuv 的线程池，完全依赖网络。</p>
+<p><code>dns.resolve()</code> 不会是 libuv 超负荷，所以使用 <code>dns.resolve()</code> 而不是 <code>dns.lookup</code> 是更好的选择，除非需要考虑 <code>getaddrinfo</code> 会用到的配置文件 <code>/etc/nsswitch.conf</code> <code>/etc/hosts</code>。</p>
+<p>但还有一个更大的问题！</p>
+<p>假如你有使用 NodeJS 发起一个访问 <code>www.example.com</code> 的 HTTP 请求。首先，它会解析 <code>www.example.com</code> 为 IP 地址。然后它使用解析得到的 IP 地址异步建立 TCP 连接。所以，发送 HTTP 请求是一个两步的过程。</p>
+<p>现在，Node <code>http</code> <code>https</code> 模块都使用 <code>dns.lookup</code> 来解析域名为 IP 地址。当 DNS 服务异常或者因为高网络&#x2F;dns 延迟，多个 http 请求会导致线程池对其他请求不可用。已经有一个关于 <code>http</code> <code>https</code> 此问题的 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3JlcXVlc3QvcmVxdWVzdC9pc3N1ZXMvMjQ5MQ==">issue<i class="fa fa-external-link-alt"></i></span> ，但到我写这篇文章为止，为了和操作系统的行为保持一致，一切还是原样。更糟的是，许多 http client 库如 <code>request</code> 也使用了 <code>http</code> <code>https</code>，受这个 issue 的影响。</p>
+<p>如果你注意到你的应用在文件 I&#x2F;O，加解密或其他线程池相关的任务有巨大的性能下降，你可以做这些来提高应用的性能：</p>
+<ul>
+<li>你可以通过设置环境变量 <code>UV_THREADPOOL_SIZE</code> 提高线程池的容量最大到 128 个线程</li>
+<li>使用 <code>dns.resolve*()</code> 解决域名或直接使用 IP。以下是一份和 <code>request</code> 相同的样例代码</li>
+</ul>
+<p><em>请注意以下代码没有经过优化，仅仅是一个如何实现的例子。另外对一个强健的实现还有很多其他因素需要考虑。而且，以下代码只能用于 Node v8.0.0 及以后，因为 <code>lookup</code> 选项在更早的 <code>tls.connect</code> 实现中不存在</em></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dns = <span class="built_in">require</span>(<span class="string">&#x27;dns&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> https = <span class="built_in">require</span>(<span class="string">&#x27;https&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> tls = <span class="built_in">require</span>(<span class="string">&#x27;tls&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&#x27;net&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> request = <span class="built_in">require</span>(<span class="string">&#x27;request&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> httpAgent = <span class="keyword">new</span> http.<span class="title class_">Agent</span>();</span><br><span class="line"><span class="keyword">const</span> httpsAgent = <span class="keyword">new</span> https.<span class="title class_">Agent</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">createConnection</span> = (<span class="params">&#123; isHttps = <span class="literal">false</span> &#125; = &#123;&#125;</span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> connect = isHttps ? tls.<span class="property">connect</span> : net.<span class="property">connect</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">function</span>(<span class="params">args, cb</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">connect</span>(&#123;</span><br><span class="line">            port : args.<span class="property">port</span>,</span><br><span class="line">            host : args.<span class="property">host</span>,</span><br><span class="line">            lookup : <span class="keyword">function</span>(<span class="params">hostname, args, cb</span>) &#123;</span><br><span class="line">                dns.<span class="title function_">resolve</span>(hostname, <span class="keyword">function</span>(<span class="params">err, ips</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (err) &#123; <span class="keyword">return</span> <span class="title function_">cb</span>(err); &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">return</span> <span class="title function_">cb</span>(<span class="literal">null</span>, ips[<span class="number">0</span>], <span class="number">4</span>);</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, cb);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">httpAgent.<span class="property">createConnection</span> = <span class="title function_">createConnection</span>();</span><br><span class="line">httpsAgent.<span class="property">createConnection</span> = <span class="title function_">createConnection</span>(&#123;<span class="attr">isHttps</span>: <span class="literal">true</span>&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getRequest</span>(<span class="params">reqUrl</span>) &#123;</span><br><span class="line">    <span class="title function_">request</span>(&#123;</span><br><span class="line">        <span class="attr">method</span>: <span class="string">&#x27;get&#x27;</span>,</span><br><span class="line">        <span class="attr">url</span>: reqUrl,</span><br><span class="line">        <span class="attr">agent</span>: httpsAgent</span><br><span class="line">    &#125;, <span class="function">(<span class="params">err, res</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) <span class="keyword">throw</span> err;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(res.<span class="property">body</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">getRequest</span>(<span class="string">&#x27;https://example.com&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="线程池的注意点"><a href="#线程池的注意点" class="headerlink" title="线程池的注意点"></a>线程池的注意点</h2><p>正如我们在这一系列所见，libuv 线程池除了文件 I&#x2F;O 还用于很多其他地方，它可能是应用的瓶颈。如果你认为你的应用在文件 I&#x2F;O 或加解密操作比平常更慢，考虑通过环境变量 <code>UV_THREADPOOL_SIZE</code> 增加线程池的规模。</p>
+<h2 id="事件循环监控"><a href="#事件循环监控" class="headerlink" title="事件循环监控"></a>事件循环监控</h2><p>监控事件循环延迟在避免应用混乱非常重要。这也可以用来报警，执行强制重启和扩容服务。</p>
+<p>最简单的识别事件循环延迟的方法是通过检查一个计时器执行回调所需额外花费的时间。简单来说，假如我们设置一个 500 ms 后执行的计时器，如果它花费 550 ms 执行回调，我们可以推测事件循环的延迟大概是 50 ms。额外花费的 50 ms 用于执行事件循环的其他阶段。你也不需要自己写上述脚本，相反可以使用 <a target="_blank" rel="noopener external nofollow noreferrer" href="https://www.npmjs.com/package/loopbench"><code>loopbench</code></a> 来监控事件循环。让我们看看如何使用：</p>
+<p>安装这个库之后，你可以在你的应用中用以下代码使用 <code>loopbench</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title class_">LoopBench</span> = <span class="built_in">require</span>(<span class="string">&#x27;loopbench&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> loopBench = <span class="title class_">LoopBench</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`loop delay: <span class="subst">$&#123;loopBench.delay&#125;</span>`</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`loop delay limit: <span class="subst">$&#123;loopBench.limit&#125;</span>`</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`is loop overloaded: <span class="subst">$&#123;loopBench.overlimit&#125;</span>`</span>);</span><br></pre></td></tr></table></figure>
+
+<p>通过这段代码，你可以暴露一个健康检查点，用于暴露这些值你可以和其他的监控&#x2F;报警工具进行集成。</p>
+<p>上述例子中 API 的一个响应示例类似以下结构:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;message&quot;</span>: <span class="string">&quot;application is running&quot;</span>,</span><br><span class="line">  <span class="string">&quot;data&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;loop_delay&quot;</span>: <span class="string">&quot;1.2913 ms&quot;</span>,</span><br><span class="line">    <span class="string">&quot;loop_delay_limit&quot;</span>: <span class="string">&quot;42 ms&quot;</span>,</span><br><span class="line">    <span class="string">&quot;is_loop_overloaded&quot;</span>: <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>通过这种实现，当循环已经超负荷，为了防止加剧超负荷，你可以在健康检查 API 返回 503 服务不可用的响应。如果你需要高可用性，这也可以帮助负载均衡来代理请求到应用的其他实例。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/" rel="bookmark">（译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3Byb21pc2VzLW5leHQtdGlja3MtYW5kLWltbWVkaWF0ZXMtbm9kZWpzLWV2ZW50LWxvb3AtcGFydC0zLTkyMjZjYmU3YTZhYQ==">Promises, Next-Ticks, and Immediates— NodeJS Event Loop Part 3, Deepal Jayasekara, Jul 22, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>系列上篇文章 <a href="/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/" title="（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick">（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick</a> 讲述了事件循环中的计时器，immediates 和每个队列如何按顺序执行。这篇文章将关注事件循环如何处理 resolved&#x2F;rejected promises (包括原生的 JS promises, Q promises, 和 Bluebird promises) 和 next tick 回调。如果你对 Promises 不熟悉，建议你先对 Promises 进行初步了解。</p></p></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/01/02/JS-collection/" rel="prev" title="JS-collection">
+                  <i class="fa fa-chevron-left"></i> JS-collection
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/03/Calibre-%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" rel="next" title="Calibre 使用记录">
+                  Calibre 使用记录 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"8533a4b54167019ee9df2ba434075a1b"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
