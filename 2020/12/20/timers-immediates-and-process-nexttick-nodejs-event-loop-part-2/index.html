@@ -30,14 +30,14 @@
 <meta property="og:site_name" content="野草">
 <meta property="og:description" content="原文地址：Timers, Immediates and Process.nextTick— NodeJS Event Loop Part 2, Deepal Jayasekara, May 11, 2017 上篇文章 （译文）NodeJS 事件循环（一）- 事件循环机制概述 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ilyydy.github.io/1.all-Q.png">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/1.all-Q.png">
 <meta property="article:published_time" content="2020-12-20T07:31:18.000Z">
 <meta property="article:modified_time" content="2020-12-20T07:32:18.000Z">
 <meta property="article:author" content="张生">
 <meta property="article:tag" content="Node.js">
 <meta property="article:tag" content="事件循环">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ilyydy.github.io/1.all-Q.png">
+<meta name="twitter:image" content="https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/1.all-Q.png">
 
 
 <link rel="canonical" href="https://ilyydy.github.io/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/">
@@ -303,7 +303,7 @@
 <p>上篇文章 <a href="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" title="（译文）NodeJS 事件循环（一）- 事件循环机制概述">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a> 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates and process.nextTick 回调。</p>
 <span id="more"></span>
 
-<h2 id="Next-Tick-Queue"><a href="#Next-Tick-Queue" class="headerlink" title="Next Tick Queue"></a>Next Tick Queue</h2><p><img data-src="/1.all-Q.png"></p>
+<h2 id="Next-Tick-Queue"><a href="#Next-Tick-Queue" class="headerlink" title="Next Tick Queue"></a>Next Tick Queue</h2><p><img data-src="/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/1.all-Q.png"></p>
 <p>Next tick 队列与其他 4 个主要队列分隔开，是因为它不是 libuv 原生提供的，而是 Node 自己实现的。</p>
 <p>事件循环中要移动到一个阶段前（timers queue, IO events queue, immediates queue, close handlers queue 是 4 个主要的阶段），Node 会检查 <code>nextTick</code> 队列是否为空。如果不为空，Node 会一直处理该队列直到不为空。</p>
 <blockquote>

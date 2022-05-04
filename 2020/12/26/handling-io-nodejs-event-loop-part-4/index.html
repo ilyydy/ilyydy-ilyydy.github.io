@@ -30,17 +30,17 @@
 <meta property="og:site_name" content="野草">
 <meta property="og:description" content="原文地址：Handling IO — NodeJS Event Loop Part 4, Deepal Jayasekara, Nov 26, 2017 系列上篇文章 （译文）NodeJS 事件循环（三）- Promises, Next-Ticks, and Immediates 本篇文章中，我将详细讨论 NodeJS 如何处理 I&#x2F;O，深入探讨事件循环的实现以及 I&#x2F;O 如何">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ilyydy.github.io/1.jpg">
-<meta property="og:image" content="https://ilyydy.github.io/2.NodeJS-Architecture.png">
-<meta property="og:image" content="https://ilyydy.github.io/3.all-Q.png">
-<meta property="og:image" content="https://ilyydy.github.io/4.Event-loop-and-JavaScript.jpg">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/1.jpg">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/2.NodeJS-Architecture.png">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/3.all-Q.png">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/4.Event-loop-and-JavaScript.jpg">
 <meta property="article:published_time" content="2020-12-26T08:24:18.000Z">
 <meta property="article:modified_time" content="2020-12-26T08:24:18.000Z">
 <meta property="article:author" content="张生">
 <meta property="article:tag" content="Node.js">
 <meta property="article:tag" content="事件循环">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ilyydy.github.io/1.jpg">
+<meta name="twitter:image" content="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/1.jpg">
 
 
 <link rel="canonical" href="https://ilyydy.github.io/2020/12/26/handling-io-nodejs-event-loop-part-4/">
@@ -307,7 +307,7 @@
 <span id="more"></span>
 
 <h2 id="异步-I-x2F-O"><a href="#异步-I-x2F-O" class="headerlink" title="异步 I&#x2F;O"></a>异步 I&#x2F;O</h2><p>NodeJS 中我们反复谈到异步 I&#x2F;O。正如本系列第一篇文章提到的，I&#x2F;O 并不注定是同步的。</p>
-<p><img data-src="/1.jpg"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/1.jpg"></p>
 <p>所有操作系统实现中，它们都提供异步 I&#x2F;O 的事件通知接口（linux epoll, macOS kqueue，solaris event ports，windows IOCP 等）。NodeJS 利用这些系统级别的事件通知系统来提供非阻塞、异步 I&#x2F;O。</p>
 <p>如下图所见，NodeJS 是一系列工具的集合，它们聚合成高性能的 NodeJS 运行时。这些工具包括：</p>
 <ul>
@@ -316,9 +316,9 @@
 <li>c-ares —— DNS 操作</li>
 <li>其他插件如 http-parser，crypto 和 zlib</li>
 </ul>
-<p><img data-src="/2.NodeJS-Architecture.png" alt="Node JS High-Level Architecture"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/2.NodeJS-Architecture.png" alt="Node JS High-Level Architecture"></p>
 <p>这篇文章中我会讲解 Libuv 和它如何向 Node 提供异步 I&#x2F;O。让我们再回顾事件循环图示。</p>
-<p><img data-src="/3.all-Q.png" alt="The Event Loop in a nutshell"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/3.all-Q.png" alt="The Event Loop in a nutshell"></p>
 <p>我们已经学到的事件循环知识有：</p>
 <ul>
 <li>事件循环从处理所有过时的定时器开始</li>
@@ -340,7 +340,7 @@
 <p>我假定你对 C 有一定了解。不用太熟练，但需要能理解基本的流程。</p>
 </blockquote>
 <p>如 NodeJS 架构图所示，libuv 在架构中处于较底层的位置。现在，让我们看看 NodeJS 上层和 libuv 事件循环各阶段之间的关系。</p>
-<p><img data-src="/4.Event-loop-and-JavaScript.jpg" alt="Event loop and JavaScript"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/4.Event-loop-and-JavaScript.jpg" alt="Event loop and JavaScript"></p>
 <p>图 “The Event Loop in a nutshell” 中事件循环存在 4 个可区分的阶段。但在 libuv 中其实存在 7 个可区分的阶段：</p>
 <ol>
 <li>Timers —— 执行过期的 <code>setTimeout</code> 和 <code>setInterval</code> 回调</li>

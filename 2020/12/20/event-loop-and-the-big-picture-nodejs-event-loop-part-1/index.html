@@ -30,18 +30,18 @@
 <meta property="og:site_name" content="野草">
 <meta property="og:description" content="原文地址：Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017 处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ilyydy.github.io/1.Event-Loop.jpeg">
-<meta property="og:image" content="https://ilyydy.github.io/2.Official-libuv-logo.png">
-<meta property="og:image" content="https://ilyydy.github.io/3.libuv-architecture.jpeg">
-<meta property="og:image" content="https://ilyydy.github.io/4.all-Q.png">
-<meta property="og:image" content="https://ilyydy.github.io/5.NodeJS-Architecture.png">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/1.Event-Loop.jpeg">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/2.Official-libuv-logo.png">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/3.libuv-architecture.jpeg">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/4.all-Q.png">
+<meta property="og:image" content="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/5.NodeJS-Architecture.png">
 <meta property="article:published_time" content="2020-12-20T05:42:18.000Z">
 <meta property="article:modified_time" content="2020-12-20T05:42:18.000Z">
 <meta property="article:author" content="张生">
 <meta property="article:tag" content="Node.js">
 <meta property="article:tag" content="事件循环">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ilyydy.github.io/1.Event-Loop.jpeg">
+<meta name="twitter:image" content="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/1.Event-Loop.jpeg">
 
 
 <link rel="canonical" href="https://ilyydy.github.io/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/">
@@ -314,7 +314,7 @@
 <li>如果事件队列中没有待处理的事件或者事件多路分用器没有挂起的请求，程序会结束。否则，又会从第一步重新开始。</li>
 </ol>
 <p>协调整个机制的程序被称为<strong>事件循环（Event Loop）</strong>。</p>
-<p><img data-src="/1.Event-Loop.jpeg" alt="Event Loop"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/1.Event-Loop.jpeg" alt="Event Loop"></p>
 <p>事件循环是单线程和半无限的循环。因为它在没有更多的工作要做时会在一些点退出，这就是为什么称为半无限循环的原因。在开发者的视角，这就是程序退出的地方。</p>
 <blockquote>
 <p>注意: 不要将事件循环和 NodeJs 的 EventEmitter 混淆。EventEmitter 跟事件循环相比完全是另一个不同的概念。</p>
@@ -337,7 +337,7 @@
 </blockquote>
 <p>为了管理整个过程同时支持跨平台的 I&#x2F;O，应该有一个抽象层封装了平台间和平台内的复杂度，并且为 Node 提供上层通用 API。</p>
 <p>那么是谁呢？女士们，先生们，有请 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2xpYnV2L2xpYnV2">libuv<i class="fa fa-external-link-alt"></i></span></p>
-<p><img data-src="/2.Official-libuv-logo.png" alt="Official-libuv-logo.png"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/2.Official-libuv-logo.png" alt="Official-libuv-logo.png"></p>
 <p><span class="exturl" data-url="aHR0cDovL2RvY3MubGlidXYub3JnL2VuL3YxLngvZGVzaWduLmh0bWw=">official libuv docs<i class="fa fa-external-link-alt"></i></span></p>
 <blockquote>
 <p>libuv is cross-platform support library which was originally written for NodeJS. It’s designed around the event-driven asynchronous I&#x2F;O model.</p>
@@ -346,7 +346,7 @@
 <p>The library provides much more than a simple abstraction over different I&#x2F;O polling mechanisms: ‘handles’ and ‘streams’ provide a high level abstraction for sockets and other entities; cross-platform file I&#x2F;O and threading functionality is also provided, amongst other things.</p>
 </blockquote>
 <p>让我们看下 libuv 的组成。下面的图表来自于官方文档，描述了暴露出的通用 API 处理了哪些不同类型的 I&#x2F;O。</p>
-<p><img data-src="/3.libuv-architecture.jpeg" alt="libuv-architecture"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/3.libuv-architecture.jpeg" alt="libuv-architecture"></p>
 <p>现在我们知道<strong>事件多路分发器</strong>，不是一个原子的实体，而是一个被 Libuv 抽象出的处理 I&#x2F;O 过程的 APIs 集合，暴露给 NodeJS 的上层使用。libuv 除了提供事件多路分发器给 Node，它还为 NodeJS 提供了完整的事件循环功能，包含事件队列机制。</p>
 <p>现在让我们看下<strong>事件队列</strong>。</p>
 <h2 id="事件队列"><a href="#事件队列" class="headerlink" title="事件队列"></a>事件队列</h2><p>事件队列按理说是一个所有事件入队，然后事件循环按顺序处理，直到队列为空的数据结构。但是在 Node 中实际发生的和反应器模式描述的完全不同。所以差异在哪？</p>
@@ -370,7 +370,7 @@
 <li><strong>other Microtasks Queue</strong> - 包含其他微任务如成功的 Promise 回调</li>
 </ul>
 <h2 id="它是如何工作的？"><a href="#它是如何工作的？" class="headerlink" title="它是如何工作的？"></a>它是如何工作的？</h2><p>正如你在下面图表中所见，Node 开始事件循环先检查 timers 队列中是否有任何过期的 timers，然后在每个步骤中处理每个队列，同时保持对所有待处理对象的引用计数器。处理完 close handlers 队列，如果在所有的队列中没有要处理的项，而且也没有挂起的操作，那么循环将会退出。在事件循环中每个队列的处理过程可以看做事件循环的一个阶段。</p>
-<p><img data-src="/4.all-Q.png"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/4.all-Q.png"></p>
 <p>有趣的是被描绘成红色的中间队列，只要一个阶段结束，事件循环将会检查这两个中间阶段是否有要处理的项。如果有，事件循环会立马开始处理它们直到两个队列为空。一旦为空，事件循环就移到下一个阶段。</p>
 <blockquote>
 <p>E.g, 事件循环当前处理有着 5 个事件处理器的 immediate queue。同时，两个处理器回调被添加到 next tick queue。一旦事件处理器完成 immediate queue 中的 5 个事件处理器，事件循环将会在移到 close handlers 队列之前检测到 next tick queue 里面有两个要处理的项。然后事件处理器会处理完 next tick queue 里面的处理器。然后移到 close handlers 队列。</p>
@@ -385,7 +385,7 @@
 </blockquote>
 <p>我将会在之后的文章中用示例深入讨论这些队列。</p>
 <p>最后，你知道了什么是事件循环，如何实现的和 Node 处理异步 I&#x2F;O。让我们看下 Libuv 在 NodeJS 架构中的位置。</p>
-<p><img data-src="/5.NodeJS-Architecture.png" alt="NodeJS-Architecture"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/5.NodeJS-Architecture.png" alt="NodeJS-Architecture"></p>
 
     </div>
 

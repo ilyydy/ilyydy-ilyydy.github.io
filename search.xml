@@ -22,10 +22,11 @@
     <content><![CDATA[<p>Ubuntu 18.04，Node.js v12.18.2 下 Github+Hexo+Next 的搭建记录摘要</p>
 <span id="more"></span>
 
-<h2 id="2022-04-03-20-39-22-更新"><a href="#2022-04-03-20-39-22-更新" class="headerlink" title="2022-04-03 20:39:22 更新"></a>2022-04-03 20:39:22 更新</h2><ul>
+<h2 id="2022-05-05-00-47-45-更新"><a href="#2022-05-05-00-47-45-更新" class="headerlink" title="2022-05-05 00:47:45 更新"></a>2022-05-05 00:47:45 更新</h2><ul>
 <li>升级依赖，主要是 hexo 到 6.1.0</li>
 <li>评论系统改用 gitalk</li>
 <li>相关博文推荐插件去掉 hexo-related-popular-posts ，改用 hexo-related-posts</li>
+<li>增加配置，解决 markdown 中图片路径不正确问题<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">marked:</span></span><br><span class="line"><span class="attr">prependRoot:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">postAsset:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
 </ul>
 <h2 id="基础安装和配置"><a href="#基础安装和配置" class="headerlink" title="基础安装和配置"></a>基础安装和配置</h2><ol>
 <li>安装依赖</li>
@@ -260,7 +261,7 @@
 <li>如果事件队列中没有待处理的事件或者事件多路分用器没有挂起的请求，程序会结束。否则，又会从第一步重新开始。</li>
 </ol>
 <p>协调整个机制的程序被称为<strong>事件循环（Event Loop）</strong>。</p>
-<p><img data-src="/1.Event-Loop.jpeg" alt="Event Loop"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/1.Event-Loop.jpeg" alt="Event Loop"></p>
 <p>事件循环是单线程和半无限的循环。因为它在没有更多的工作要做时会在一些点退出，这就是为什么称为半无限循环的原因。在开发者的视角，这就是程序退出的地方。</p>
 <blockquote>
 <p>注意: 不要将事件循环和 NodeJs 的 EventEmitter 混淆。EventEmitter 跟事件循环相比完全是另一个不同的概念。</p>
@@ -283,7 +284,7 @@
 </blockquote>
 <p>为了管理整个过程同时支持跨平台的 I&#x2F;O，应该有一个抽象层封装了平台间和平台内的复杂度，并且为 Node 提供上层通用 API。</p>
 <p>那么是谁呢？女士们，先生们，有请 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2xpYnV2L2xpYnV2">libuv<i class="fa fa-external-link-alt"></i></span></p>
-<p><img data-src="/2.Official-libuv-logo.png" alt="Official-libuv-logo.png"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/2.Official-libuv-logo.png" alt="Official-libuv-logo.png"></p>
 <p><span class="exturl" data-url="aHR0cDovL2RvY3MubGlidXYub3JnL2VuL3YxLngvZGVzaWduLmh0bWw=">official libuv docs<i class="fa fa-external-link-alt"></i></span></p>
 <blockquote>
 <p>libuv is cross-platform support library which was originally written for NodeJS. It’s designed around the event-driven asynchronous I&#x2F;O model.</p>
@@ -292,7 +293,7 @@
 <p>The library provides much more than a simple abstraction over different I&#x2F;O polling mechanisms: ‘handles’ and ‘streams’ provide a high level abstraction for sockets and other entities; cross-platform file I&#x2F;O and threading functionality is also provided, amongst other things.</p>
 </blockquote>
 <p>让我们看下 libuv 的组成。下面的图表来自于官方文档，描述了暴露出的通用 API 处理了哪些不同类型的 I&#x2F;O。</p>
-<p><img data-src="/3.libuv-architecture.jpeg" alt="libuv-architecture"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/3.libuv-architecture.jpeg" alt="libuv-architecture"></p>
 <p>现在我们知道<strong>事件多路分发器</strong>，不是一个原子的实体，而是一个被 Libuv 抽象出的处理 I&#x2F;O 过程的 APIs 集合，暴露给 NodeJS 的上层使用。libuv 除了提供事件多路分发器给 Node，它还为 NodeJS 提供了完整的事件循环功能，包含事件队列机制。</p>
 <p>现在让我们看下<strong>事件队列</strong>。</p>
 <h2 id="事件队列"><a href="#事件队列" class="headerlink" title="事件队列"></a>事件队列</h2><p>事件队列按理说是一个所有事件入队，然后事件循环按顺序处理，直到队列为空的数据结构。但是在 Node 中实际发生的和反应器模式描述的完全不同。所以差异在哪？</p>
@@ -316,7 +317,7 @@
 <li><strong>other Microtasks Queue</strong> - 包含其他微任务如成功的 Promise 回调</li>
 </ul>
 <h2 id="它是如何工作的？"><a href="#它是如何工作的？" class="headerlink" title="它是如何工作的？"></a>它是如何工作的？</h2><p>正如你在下面图表中所见，Node 开始事件循环先检查 timers 队列中是否有任何过期的 timers，然后在每个步骤中处理每个队列，同时保持对所有待处理对象的引用计数器。处理完 close handlers 队列，如果在所有的队列中没有要处理的项，而且也没有挂起的操作，那么循环将会退出。在事件循环中每个队列的处理过程可以看做事件循环的一个阶段。</p>
-<p><img data-src="/4.all-Q.png"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/4.all-Q.png"></p>
 <p>有趣的是被描绘成红色的中间队列，只要一个阶段结束，事件循环将会检查这两个中间阶段是否有要处理的项。如果有，事件循环会立马开始处理它们直到两个队列为空。一旦为空，事件循环就移到下一个阶段。</p>
 <blockquote>
 <p>E.g, 事件循环当前处理有着 5 个事件处理器的 immediate queue。同时，两个处理器回调被添加到 next tick queue。一旦事件处理器完成 immediate queue 中的 5 个事件处理器，事件循环将会在移到 close handlers 队列之前检测到 next tick queue 里面有两个要处理的项。然后事件处理器会处理完 next tick queue 里面的处理器。然后移到 close handlers 队列。</p>
@@ -331,7 +332,7 @@
 </blockquote>
 <p>我将会在之后的文章中用示例深入讨论这些队列。</p>
 <p>最后，你知道了什么是事件循环，如何实现的和 Node 处理异步 I&#x2F;O。让我们看下 Libuv 在 NodeJS 架构中的位置。</p>
-<p><img data-src="/5.NodeJS-Architecture.png" alt="NodeJS-Architecture"></p>
+<p><img data-src="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/5.NodeJS-Architecture.png" alt="NodeJS-Architecture"></p>
 ]]></content>
       <categories>
         <category>编程</category>
@@ -422,7 +423,7 @@
 <span id="more"></span>
 
 <h2 id="异步-I-x2F-O"><a href="#异步-I-x2F-O" class="headerlink" title="异步 I&#x2F;O"></a>异步 I&#x2F;O</h2><p>NodeJS 中我们反复谈到异步 I&#x2F;O。正如本系列第一篇文章提到的，I&#x2F;O 并不注定是同步的。</p>
-<p><img data-src="/1.jpg"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/1.jpg"></p>
 <p>所有操作系统实现中，它们都提供异步 I&#x2F;O 的事件通知接口（linux epoll, macOS kqueue，solaris event ports，windows IOCP 等）。NodeJS 利用这些系统级别的事件通知系统来提供非阻塞、异步 I&#x2F;O。</p>
 <p>如下图所见，NodeJS 是一系列工具的集合，它们聚合成高性能的 NodeJS 运行时。这些工具包括：</p>
 <ul>
@@ -431,9 +432,9 @@
 <li>c-ares —— DNS 操作</li>
 <li>其他插件如 http-parser，crypto 和 zlib</li>
 </ul>
-<p><img data-src="/2.NodeJS-Architecture.png" alt="Node JS High-Level Architecture"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/2.NodeJS-Architecture.png" alt="Node JS High-Level Architecture"></p>
 <p>这篇文章中我会讲解 Libuv 和它如何向 Node 提供异步 I&#x2F;O。让我们再回顾事件循环图示。</p>
-<p><img data-src="/3.all-Q.png" alt="The Event Loop in a nutshell"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/3.all-Q.png" alt="The Event Loop in a nutshell"></p>
 <p>我们已经学到的事件循环知识有：</p>
 <ul>
 <li>事件循环从处理所有过时的定时器开始</li>
@@ -455,7 +456,7 @@
 <p>我假定你对 C 有一定了解。不用太熟练，但需要能理解基本的流程。</p>
 </blockquote>
 <p>如 NodeJS 架构图所示，libuv 在架构中处于较底层的位置。现在，让我们看看 NodeJS 上层和 libuv 事件循环各阶段之间的关系。</p>
-<p><img data-src="/4.Event-loop-and-JavaScript.jpg" alt="Event loop and JavaScript"></p>
+<p><img data-src="/2020/12/26/handling-io-nodejs-event-loop-part-4/4.Event-loop-and-JavaScript.jpg" alt="Event loop and JavaScript"></p>
 <p>图 “The Event Loop in a nutshell” 中事件循环存在 4 个可区分的阶段。但在 libuv 中其实存在 7 个可区分的阶段：</p>
 <ol>
 <li>Timers —— 执行过期的 <code>setTimeout</code> 和 <code>setInterval</code> 回调</li>
@@ -557,7 +558,7 @@
 <p>Node v11 引入了一些变化，对 <code>nextTick</code>，<code>Promise</code>，<code>setImmediate</code> 和 <code>setTimeout</code> 回调的执行顺序有巨大影响。详细介绍见 <span class="exturl" data-url="aHR0cHM6Ly9tZWRpdW0uY29tL0BkcGpheWFzZWthcmEvbmV3LWNoYW5nZXMtdG8tdGltZXJzLWFuZC1taWNyb3Rhc2tzLWZyb20tbm9kZS12MTEtMC0wLWFuZC1hYm92ZS02OGQxMTI3NDNlYjM=">https://medium.com/@dpjayasekara/new-changes-to-timers-and-microtasks-from-node-v11-0-0-and-above-68d112743eb3<i class="fa fa-external-link-alt"></i></span></p>
 </blockquote>
 <p>原生 promise 的回调被认为是一种微任务，并被添加到 microtask 队列，并紧接着 next tick 队列被处理。</p>
-<p><img data-src="/1.all-Q.png"></p>
+<p><img data-src="/2020/12/20/promises-next-ticks-and-immediates-nodejs-event-loop-part-3/1.all-Q.png"></p>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;promise1 resolved&#x27;</span>));</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;promise2 resolved&#x27;</span>));</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;promise3 resolved&#x27;</span>);</span><br><span class="line">    process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;next tick inside promise resolve handler&#x27;</span>));</span><br><span class="line">&#125;);</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;promise4 resolved&#x27;</span>));</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;promise5 resolved&#x27;</span>));</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;set immediate1&#x27;</span>));</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;set immediate2&#x27;</span>));</span><br><span class="line"></span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;next tick1&#x27;</span>));</span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;next tick2&#x27;</span>));</span><br><span class="line">process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;next tick3&#x27;</span>));</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;set timeout&#x27;</span>), <span class="number">0</span>);</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;set immediate3&#x27;</span>));</span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;set immediate4&#x27;</span>));</span><br></pre></td></tr></table></figure>
 
 <p>以上代码的执行流程：</p>
@@ -637,7 +638,7 @@
 <p>上篇文章 <a href="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" title="（译文）NodeJS 事件循环（一）- 事件循环机制概述">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a> 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates and process.nextTick 回调。</p>
 <span id="more"></span>
 
-<h2 id="Next-Tick-Queue"><a href="#Next-Tick-Queue" class="headerlink" title="Next Tick Queue"></a>Next Tick Queue</h2><p><img data-src="/1.all-Q.png"></p>
+<h2 id="Next-Tick-Queue"><a href="#Next-Tick-Queue" class="headerlink" title="Next Tick Queue"></a>Next Tick Queue</h2><p><img data-src="/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/1.all-Q.png"></p>
 <p>Next tick 队列与其他 4 个主要队列分隔开，是因为它不是 libuv 原生提供的，而是 Node 自己实现的。</p>
 <p>事件循环中要移动到一个阶段前（timers queue, IO events queue, immediates queue, close handlers queue 是 4 个主要的阶段），Node 会检查 <code>nextTick</code> 队列是否为空。如果不为空，Node 会一直处理该队列直到不为空。</p>
 <blockquote>
