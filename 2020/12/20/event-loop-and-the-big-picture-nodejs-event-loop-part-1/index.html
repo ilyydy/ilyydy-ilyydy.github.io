@@ -171,7 +171,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -182,7 +182,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -414,6 +414,13 @@
         <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3Byb21pc2VzLW5leHQtdGlja3MtYW5kLWltbWVkaWF0ZXMtbm9kZWpzLWV2ZW50LWxvb3AtcGFydC0zLTkyMjZjYmU3YTZhYQ==">Promises, Next-Ticks, and Immediates— NodeJS Event Loop Part 3, Deepal Jayasekara, Jul 22, 2017<i class="fa fa-external-link-alt"></i></span></p>
 <p>系列上篇文章 <a href="/2020/12/20/timers-immediates-and-process-nexttick-nodejs-event-loop-part-2/" title="（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick">（译文）NodeJS 事件循环（二）- Timers, Immediates 和 Process.nextTick</a> 讲述了事件循环中的计时器，immediates 和每个队列如何按顺序执行。这篇文章将关注事件循环如何处理 resolved&#x2F;rejected promises (包括原生的 JS promises, Q promises, 和 Bluebird promises) 和 next tick 回调。如果你对 Promises 不熟悉，建议你先对 Promises 进行初步了解。</p></p></div>
     </li>
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2021-02-28</div>
+      <div class="popular-posts-title"><a href="2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/" rel="bookmark">（译文）NodeJS 事件循环（五）- 最佳实践</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYmVzdC1wcmFjdGljZXMtbm9kZWpzLWV2ZW50LWxvb3AtcGFydC01LWUyOWIyYjUwYmZlMg==">Event Loop Best Practices — NodeJS Event Loop Part 5, Deepal Jayasekara, Dec 29, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>事件循环这一系列文章到此已经讨论了事件循环和它不同的阶段，包括 <code>setImmediate</code>， <code>nextTick</code> 计时器以及上篇文章 <a href="/2020/12/26/handling-io-nodejs-event-loop-part-4/" title="（译文）NodeJS 事件循环（四）- Handling IO">（译文）NodeJS 事件循环（四）- Handling IO</a> 的 I&#x2F;O。我相信你现在已经很好地理解 NodeJS 的事件循环。因此现在来谈谈最佳实践，怎样才能在开发 Node 应用时获得最好的结果和性能表现。</p>
+<p>大多数人因为不了解事件循环、错误处理和异步的相关概念（我在<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3lvdS1yZWFsbHktaGF0ZS1ub2RlLTU4YjFmZjcyMjAyZA==">这篇博客<i class="fa fa-external-link-alt"></i></span>中进行了详细讨论）而搞砸了他们最初的 NodeJS 应用。因为你已经理解了事件循环，我相信你或许已经知道而且能够理解我下面将要提到的最佳实践。现在让我们一起看看吧。</p></p></div>
+    </li>
   </ul>
 
 
@@ -472,13 +479,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">109k</span>
+    <span title="站点总字数">111k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:02</span>
+    <span title="站点阅读时长">3:05</span>
   </span>
 </div>
   <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动

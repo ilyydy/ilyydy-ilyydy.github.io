@@ -23,28 +23,29 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="记录常用的一些软件">
+    <meta name="description" content="monorepo.tools 介绍和对比了一些主流的解决方案，其中和 js&#x2F;ts 生态联系紧密主要是 Lerna，Nx，Turborepo，Rush。研究了这几种方案的文档和入门使用，再看了看几位开发者的介绍和评价。总结它们的优缺点如下：">
 <meta property="og:type" content="article">
-<meta property="og:title" content="常用软件集锦">
-<meta property="og:url" content="https://ilyydy.github.io/2022/04/03/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E9%9B%86%E9%94%A6/index.html">
+<meta property="og:title" content="Node.Js MonoRepo 方案">
+<meta property="og:url" content="https://ilyydy.github.io/2022/08/10/Node-Js-MonoRepo-%E6%96%B9%E6%A1%88/index.html">
 <meta property="og:site_name" content="野草">
-<meta property="og:description" content="记录常用的一些软件">
+<meta property="og:description" content="monorepo.tools 介绍和对比了一些主流的解决方案，其中和 js&#x2F;ts 生态联系紧密主要是 Lerna，Nx，Turborepo，Rush。研究了这几种方案的文档和入门使用，再看了看几位开发者的介绍和评价。总结它们的优缺点如下：">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-04-03T13:05:48.000Z">
-<meta property="article:modified_time" content="2022-04-03T13:05:48.000Z">
+<meta property="article:published_time" content="2022-08-10T14:46:33.000Z">
+<meta property="article:modified_time" content="2022-08-10T14:46:33.000Z">
 <meta property="article:author" content="张生">
-<meta property="article:tag" content="常用软件">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="MonoRepo">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://ilyydy.github.io/2022/04/03/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E9%9B%86%E9%94%A6/">
+<link rel="canonical" href="https://ilyydy.github.io/2022/08/10/Node-Js-MonoRepo-%E6%96%B9%E6%A1%88/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2022/04/03/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E9%9B%86%E9%94%A6/","path":"2022/04/03/常用软件集锦/","title":"常用软件集锦"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2022/08/10/Node-Js-MonoRepo-%E6%96%B9%E6%A1%88/","path":"2022/08/10/Node-Js-MonoRepo-方案/","title":"Node.Js MonoRepo 方案"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>常用软件集锦 | 野草</title>
+<title>Node.Js MonoRepo 方案 | 野草</title>
   
   <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
   <script src="/js/third-party/analytics/google-analytics.js"></script>
@@ -136,7 +137,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -149,6 +150,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#lerna"><span class="nav-number">1.</span> <span class="nav-text">lerna</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">1.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nx"><span class="nav-number">2.</span> <span class="nav-text">Nx</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9-1"><span class="nav-number">2.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9-1"><span class="nav-number">2.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Turborepo"><span class="nav-number">3.</span> <span class="nav-text">Turborepo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9-2"><span class="nav-number">3.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9-2"><span class="nav-number">3.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rush"><span class="nav-number">4.</span> <span class="nav-text">Rush</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9-3"><span class="nav-number">4.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9-3"><span class="nav-number">4.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monorepo-%E5%B7%A5%E5%85%B7%E5%BA%94%E5%85%B7%E5%A4%87%E7%9A%84%E8%83%BD%E5%8A%9B"><span class="nav-number">5.</span> <span class="nav-text">monorepo 工具应具备的能力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -224,7 +226,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2022/04/03/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E9%9B%86%E9%94%A6/">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2022/08/10/Node-Js-MonoRepo-%E6%96%B9%E6%A1%88/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -237,12 +239,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="常用软件集锦 | 野草">
+      <meta itemprop="name" content="Node.Js MonoRepo 方案 | 野草">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          常用软件集锦
+          Node.Js MonoRepo 方案
         </h1>
 
         <div class="post-meta-container">
@@ -253,7 +255,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-03 21:05:48" itemprop="dateCreated datePublished" datetime="2022-04-03T21:05:48+08:00">2022-04-03</time>
+      <time title="创建时间：2022-08-10 22:46:33" itemprop="dateCreated datePublished" datetime="2022-08-10T22:46:33+08:00">2022-08-10</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -261,7 +263,11 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">常用软件</span></a>
+          <a href="/categories/%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">编程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B/Node-js/" itemprop="url" rel="index"><span itemprop="name">Node.js</span></a>
         </span>
     </span>
 
@@ -272,14 +278,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>163</span>
+      <span>1.7k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
+      <span>3 分钟</span>
     </span>
 </div>
 
@@ -290,53 +296,75 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>记录常用的一些软件</p>
+        <p><span class="exturl" data-url="aHR0cHM6Ly9tb25vcmVwby50b29scy8=">monorepo.tools<i class="fa fa-external-link-alt"></i></span> 介绍和对比了一些主流的解决方案，其中和 js&#x2F;ts 生态联系紧密主要是 Lerna，Nx，Turborepo，Rush。研究了这几种方案的文档和入门使用，再看了看几位开发者的介绍和评价。总结它们的优缺点如下：</p>
 <span id="more"></span>
 
-<ul>
-<li>文件搜索<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudm9pZHRvb2xzLmNvbS96aC1jbi9kb3dubG9hZHMv">Everything<i class="fa fa-external-link-alt"></i></span></li>
-<li><span class="exturl" data-url="aHR0cHM6Ly93d3cubGlzdGFyeS5jb20vZG93bmxvYWQ=">Listary<i class="fa fa-external-link-alt"></i></span></li>
+<h2 id="lerna"><a href="#lerna" class="headerlink" title="lerna"></a><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2xlcm5hL2xlcm5h">lerna<i class="fa fa-external-link-alt"></i></span></h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>具备依赖管理能力（实际一般使用包管理器的 workspace 功能）</li>
+<li>具备版本管理和发布能力</li>
+<li>具备任务编排能力</li>
+<li>已经被 Nx 团队接手，容易与 nx 集成</li>
 </ul>
-</li>
-<li>解压缩工具<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuNy16aXAub3JnL2Rvd25sb2FkLmh0bWw=">7-zip<i class="fa fa-external-link-alt"></i></span></li>
-<li>Bandizip</li>
-<li>WinRAR</li>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>package 多任务执行时会慢。可与 nx 集成优化</li>
+<li>使用 lerna bootstrap 安装部分 package 的依赖的命令长，比较麻烦</li>
+<li>每个 package 各自安装依赖，重复，并且慢。可以结合 pnpm 解决</li>
+<li>使用 root node_modules 和依赖提升存在 Phantom Dependencies 和 Doppelgnger。可以结合 pnpm 解决</li>
+<li>lerna 和包管理器的命令不统一</li>
 </ul>
-</li>
-<li>视频播放器<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9wb3RwbGF5ZXIuZGF1bS5uZXQv">Potplayer<i class="fa fa-external-link-alt"></i></span></li>
-<li>IINA</li>
+<p>总结：lerna + 包管理器 workspace 是目前应用最多、较为轻量的 monorepo 方案，容易上手，适合小型 monorepo。大型 monorepo 项目考虑集成 nx 增强任务编排能力</p>
+<h2 id="Nx"><a href="#Nx" class="headerlink" title="Nx"></a><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL25yd2wvbng=">Nx<i class="fa fa-external-link-alt"></i></span></h2><h3 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>优秀的任务编排，计算缓存，增量构建，分布式任务执行</li>
+<li>更深入的依赖和 package 关系分析，可视化依赖图，增强 package 间的引用约束</li>
+<li>生态丰富：各类框架&#x2F;工具集成，代码快速生成，自定义执行器</li>
+<li>全工作流命令统一，支持自定义任务&#x2F;命令</li>
 </ul>
-</li>
-<li>卡片式记忆辅助<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9hcHBzLmFua2l3ZWIubmV0Lw==">Anki<i class="fa fa-external-link-alt"></i></span></li>
+<h3 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>倾向于所有 package 共用同一份 package.json 和 root node_modules，前后端项目会共用依赖，所以也不需要依赖管理能力</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ueC5kZXYvbWlncmF0aW9uL2xlcm5hLWFuZC1ueCN2ZXJzaW9uLW1hbmFnZW1lbnQtJi1wdWJsaXNoaW5n">没有版本管理和发布<i class="fa fa-external-link-alt"></i></span>，可以使用插件或与 lerna 集成</li>
+<li>本身不解决 Phantom Dependencies 和 Doppelgnger。可以结合 pnpm 解决</li>
 </ul>
-</li>
-<li>截图软件<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC5zbmlwYXN0ZS5jb20vZG93bmxvYWQuaHRtbA==">Snipaste<i class="fa fa-external-link-alt"></i></span></li>
-<li>iShot</li>
+<p>总结：功能强大，扩展性强，使用热度高，社区插件丰富，唯一的问题是使用 root node_modules 方案</p>
+<h2 id="Turborepo"><a href="#Turborepo" class="headerlink" title="Turborepo"></a><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3ZlcmNlbC90dXJib3JlcG8=">Turborepo<i class="fa fa-external-link-alt"></i></span></h2><h3 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>优秀的任务编排，计算缓存，增量构建，分布式任务执行</li>
+<li>许多命令支持分析依赖和 package 关系，如按需安装依赖，支持可视化分析</li>
+<li>一系列可选的配套工具链</li>
 </ul>
-</li>
-<li>GIF录制<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmJhaHJhbmlhcHBzLmNvbS9naWZjYW0v">GIFcam<i class="fa fa-external-link-alt"></i></span></li>
-<li>ScreenToGif</li>
-<li>LICEcap</li>
+<h3 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>没有依赖管理能力，和包管理器的命令不统一</li>
+<li>没有版本管理和发布。可以使用配置工具链</li>
+<li>本身不解决 Phantom Dependencies 和 Doppelgnger。依赖包管理器解决</li>
+<li>filter package 的命令可以很灵活，但相对书写也比较麻烦</li>
 </ul>
-</li>
-<li>电子书管理<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9jYWxpYnJlLWVib29rLmNvbS9kb3dubG9hZA==">Calibre<i class="fa fa-external-link-alt"></i></span></li>
+<p>总结：turborepo + 包管理器 workspace 优于 lerna + 包管理器 workspace。生态相对 Nx 较弱，但也够用</p>
+<h2 id="Rush"><a href="#Rush" class="headerlink" title="Rush"></a><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL21pY3Jvc29mdC9ydXNoc3RhY2s=">Rush<i class="fa fa-external-link-alt"></i></span></h2><h3 id="优点-3"><a href="#优点-3" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>具备依赖管理能力</li>
+<li>优秀的任务编排，计算缓存，增量构建，分布式任务执行</li>
+<li>支持依赖和 package 关系分析，保证版本一致性</li>
+<li>全工作流命令统一，支持自定义任务&#x2F;命令</li>
+<li>解决 Phantom Dependencies</li>
+<li>可选的全套工具链</li>
 </ul>
-</li>
-<li>笔记<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9iM2xvZy5vcmcvc2l5dWFuL2Rvd25sb2FkLmh0bWw=">思源笔记<i class="fa fa-external-link-alt"></i></span></li>
+<h3 id="缺点-3"><a href="#缺点-3" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>没有 root node_modules。可通过配套工具链统一配置解决</li>
+<li>本身不解决 Doppelgnger。需通过 pnpm 解决</li>
+<li>新增 package 需要手动编辑 rush.json</li>
+<li>可选的配套工具链配置复杂</li>
+<li>文档更新不及时</li>
 </ul>
-</li>
-<li>文件同步<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9mcmVlZmlsZXN5bmMub3JnLw==">FreeFileSync<i class="fa fa-external-link-alt"></i></span></li>
-</ul>
-</li>
+<p>总结：功能强大，扩展性强，加上配套工具链则具备一整套工作流的解决方案，相对得使用成本高，适合大型 monorepo</p>
+<h2 id="monorepo-工具应具备的能力"><a href="#monorepo-工具应具备的能力" class="headerlink" title="monorepo 工具应具备的能力"></a>monorepo 工具应具备的能力</h2><ol>
+<li>依赖管理能力，特对每个 package 的依赖的处理。随着依赖数量的增加，依旧能够保持依赖结构的正确性、稳定性以及安装效率，避免 Phantom Dependencies 和 Doppelgnger 问题</li>
+<li>package 关系分析能力，构造展现 package 之间的依赖关系，一方面方便开发者理清整个 monorepo 的结构，另一方面可用于优化任务编排<br /></li>
+<li>任务编排能力。能够以最大的效率以及正确的顺序执行 monorepo 内任务&#x2F;命令</li>
+<li>版本发布能力。能够基于改动的项目，结合 package 的关系，正确地进行版本号变更、CHANGELOG 生成以及项目发布</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uY24vcG9zdC82OTcyMTM5ODcwMjMxNzI0MDQ1">Monorepo 的这些坑，我们帮你踩过了！<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC81MDQ1NTQwNzA=">Monorepo 的过去、现在、和未来<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC81MjEwNjA5ODY=">现代 Monorepo 工程技术选型，聊聊我的思考<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC80NjgzODI3NTY=">从 Turborepo 看 Monorepo 工具的任务编排能力<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aHVhbmxhbi56aGlodS5jb20vcC8xMzc1MzU3Nzk=">node_modules 困境<i class="fa fa-external-link-alt"></i></span></li>
 </ul>
 
     </div>
@@ -345,19 +373,12 @@
     
     
       
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-        <div class="popular-posts-date">2022-04-03</div>
-      <div class="popular-posts-title"><a href="2022/04/03/Calibre-使用记录/" rel="bookmark">Calibre 使用记录</a></div>
-        <div class="popular-posts-excerpt"><p><p>使用 <span class="exturl" data-url="aHR0cHM6Ly9jYWxpYnJlLWVib29rLmNvbS9kb3dubG9hZA==">Calibre<i class="fa fa-external-link-alt"></i></span> 管理电子书</p></p></div>
-    </li>
-  </ul>
 
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 常用软件</a>
+              <a href="/tags/Node-js/" rel="tag"><i class="fa fa-tag"></i> Node.js</a>
+              <a href="/tags/MonoRepo/" rel="tag"><i class="fa fa-tag"></i> MonoRepo</a>
           </div>
 
         
@@ -369,14 +390,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2022/04/03/Calibre-%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" rel="prev" title="Calibre 使用记录">
-                  <i class="fa fa-chevron-left"></i> Calibre 使用记录
+                <a href="/2022/04/03/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E9%9B%86%E9%94%A6/" rel="prev" title="常用软件集锦">
+                  <i class="fa fa-chevron-left"></i> 常用软件集锦
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2022/08/10/Node-Js-MonoRepo-%E6%96%B9%E6%A1%88/" rel="next" title="Node.Js MonoRepo 方案">
-                  Node.Js MonoRepo 方案 <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
@@ -454,11 +472,11 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2022/04/03/%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E9%9B%86%E9%94%A6/"}</script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2022/08/10/Node-Js-MonoRepo-%E6%96%B9%E6%A1%88/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"6736f7a3b20a5f88ac03736089f2f222"}</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"80abaf3bd734bf6e96d1d4001755574a"}</script>
 <script src="/js/third-party/comments/gitalk.js"></script>
 <div class="moon-menu">
   <div class="moon-menu-items">

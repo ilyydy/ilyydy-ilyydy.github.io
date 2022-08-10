@@ -167,7 +167,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -178,7 +178,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -386,17 +386,17 @@
 <p>上篇文章 <a href="/2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" title="（译文）NodeJS 事件循环（一）- 事件循环机制概述">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a> 中我讲述了 NodeJS 事件循环的总体图景。这篇文章中，我将详细讨论三个重要的队列：timers, immediates and process.nextTick 回调。</p></p></div>
     </li>
     <li class="popular-posts-item">
-        <div class="popular-posts-date">2020-12-20</div>
-      <div class="popular-posts-title"><a href="2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" rel="bookmark">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a></div>
-        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYW5kLXRoZS1iaWctcGljdHVyZS1ub2RlanMtZXZlbnQtbG9vcC1wYXJ0LTEtMWNiNjdhMTgyODEw">Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017<i class="fa fa-external-link-alt"></i></span></p>
-<p>处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”。这句话究竟意味着什么？“非阻塞”和“事件驱动”是什么意思？所有这些问题的答案涉及到 NodeJs 的核心，事件循环。在这个系列中，我会阐释什么是事件循环，它是如何工作的，它如何影响我们的应用，如何有效使用等等。在这篇文章中，我将讲解 NodeJs 如何工作，如何访问 I&#x2F;O，如何跨平台工作等等。</p></p></div>
-    </li>
-    <li class="popular-posts-item">
         <div class="popular-posts-date">2021-02-28</div>
       <div class="popular-posts-title"><a href="2021/02/28/event-loop-best-practices-nodejs-event-loop-part-5/" rel="bookmark">（译文）NodeJS 事件循环（五）- 最佳实践</a></div>
         <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYmVzdC1wcmFjdGljZXMtbm9kZWpzLWV2ZW50LWxvb3AtcGFydC01LWUyOWIyYjUwYmZlMg==">Event Loop Best Practices — NodeJS Event Loop Part 5, Deepal Jayasekara, Dec 29, 2017<i class="fa fa-external-link-alt"></i></span></p>
 <p>事件循环这一系列文章到此已经讨论了事件循环和它不同的阶段，包括 <code>setImmediate</code>， <code>nextTick</code> 计时器以及上篇文章 <a href="/2020/12/26/handling-io-nodejs-event-loop-part-4/" title="（译文）NodeJS 事件循环（四）- Handling IO">（译文）NodeJS 事件循环（四）- Handling IO</a> 的 I&#x2F;O。我相信你现在已经很好地理解 NodeJS 的事件循环。因此现在来谈谈最佳实践，怎样才能在开发 Node 应用时获得最好的结果和性能表现。</p>
 <p>大多数人因为不了解事件循环、错误处理和异步的相关概念（我在<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L3lvdS1yZWFsbHktaGF0ZS1ub2RlLTU4YjFmZjcyMjAyZA==">这篇博客<i class="fa fa-external-link-alt"></i></span>中进行了详细讨论）而搞砸了他们最初的 NodeJS 应用。因为你已经理解了事件循环，我相信你或许已经知道而且能够理解我下面将要提到的最佳实践。现在让我们一起看看吧。</p></p></div>
+    </li>
+    <li class="popular-posts-item">
+        <div class="popular-posts-date">2020-12-20</div>
+      <div class="popular-posts-title"><a href="2020/12/20/event-loop-and-the-big-picture-nodejs-event-loop-part-1/" rel="bookmark">（译文）NodeJS 事件循环（一）- 事件循环机制概述</a></div>
+        <div class="popular-posts-excerpt"><p><p>原文地址：<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmluc2lkZXJhdHRhY2submV0L2V2ZW50LWxvb3AtYW5kLXRoZS1iaWctcGljdHVyZS1ub2RlanMtZXZlbnQtbG9vcC1wYXJ0LTEtMWNiNjdhMTgyODEw">Event Loop and the Big Picture — NodeJS Event Loop Part 1, Deepal Jayasekara, Apr 23, 2017<i class="fa fa-external-link-alt"></i></span></p>
+<p>处理 I&#x2F;O 的不同方式使得 Node.js 区别于其他的编程平台。我们常常听到别人在介绍 Node.js 时说 “一个基于 google v8 JavaScript 引擎的非阻塞，事件驱动的平台”。这句话究竟意味着什么？“非阻塞”和“事件驱动”是什么意思？所有这些问题的答案涉及到 NodeJs 的核心，事件循环。在这个系列中，我会阐释什么是事件循环，它是如何工作的，它如何影响我们的应用，如何有效使用等等。在这篇文章中，我将讲解 NodeJs 如何工作，如何访问 I&#x2F;O，如何跨平台工作等等。</p></p></div>
     </li>
   </ul>
 
@@ -456,13 +456,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">109k</span>
+    <span title="站点总字数">111k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:02</span>
+    <span title="站点阅读时长">3:05</span>
   </span>
 </div>
   <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
