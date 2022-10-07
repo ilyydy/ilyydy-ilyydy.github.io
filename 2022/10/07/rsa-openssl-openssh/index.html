@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="manifest" href="/images/site.webmanifest.json">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,700,700italic%7CArial:300,300italic,400,400italic,700,700italic%7CNoto+Serif+SC:300,300italic,400,400italic,700,700italic%7CPingFang+SC:300,300italic,400,400italic,700,700italic%7CMicrosoft+YaHei:300,300italic,400,400italic,700,700italic%7Csans-serif:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic%7Cconsolas:300,300italic,400,400italic,700,700italic%7CMenlo:300,300italic,400,400italic,700,700italic%7Cmonospace:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ilyydy.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="openssl 和 ssh-keygen 生成&#x2F;转换不同格式的 RSA 密钥">
+<meta property="og:type" content="article">
+<meta property="og:title" content="openssl 和 ssh-keygen 生成&#x2F;转换不同格式的 RSA 密钥">
+<meta property="og:url" content="https://ilyydy.github.io/2022/10/07/rsa-openssl-openssh/index.html">
+<meta property="og:site_name" content="野草">
+<meta property="og:description" content="openssl 和 ssh-keygen 生成&#x2F;转换不同格式的 RSA 密钥">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-07T06:46:00.000Z">
+<meta property="article:modified_time" content="2022-10-07T06:46:00.000Z">
+<meta property="article:author" content="张生">
+<meta property="article:tag" content="RSA">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ilyydy.github.io/2022/10/07/rsa-openssl-openssh/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ilyydy.github.io/2022/10/07/rsa-openssl-openssh/","path":"2022/10/07/rsa-openssl-openssh/","title":"openssl 和 ssh-keygen 生成/转换不同格式的 RSA 密钥"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>openssl 和 ssh-keygen 生成/转换不同格式的 RSA 密钥 | 野草</title>
+  
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-7EVCK1VXFK","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="野草" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">野草</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%86%E5%8F%B2%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">历史概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#openssl"><span class="nav-number">2.</span> <span class="nav-text">openssl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh-keygen"><span class="nav-number">3.</span> <span class="nav-text">ssh-keygen</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="张生"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">张生</p>
+  <div class="site-description" itemprop="description">目的虽有，道路却无；我们所称之为路的，无非是踌躇</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2lseXlkeQ==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilyydy"><i class="fab fa-github fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmlseXlkeUBnbWFpbC5jb20=" title="E-Mail → mailto:ilyydy@gmail.com"><i class="fa fa-envelope fa-fw"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilyydy.github.io/2022/10/07/rsa-openssl-openssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="张生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="野草">
+      <meta itemprop="description" content="目的虽有，道路却无；我们所称之为路的，无非是踌躇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="openssl 和 ssh-keygen 生成/转换不同格式的 RSA 密钥 | 野草">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          openssl 和 ssh-keygen 生成/转换不同格式的 RSA 密钥
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-10-07 14:46:00" itemprop="dateCreated datePublished" datetime="2022-10-07T14:46:00+08:00">2022-10-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">命令行工具</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>7 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>openssl 和 ssh-keygen 生成&#x2F;转换不同格式的 RSA 密钥</p>
+<span id="more"></span>
+
+<h2 id="历史概述"><a href="#历史概述" class="headerlink" title="历史概述"></a>历史概述</h2><p><span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvUlNBXyhjcnlwdG9zeXN0ZW0p">RSA<i class="fa fa-external-link-alt"></i></span> 是当今广泛使用的一种非对称加密算法，它由 Ron Rivest，Adi Shamir 和 Leonard Adleman 3 人于 1977 年一起提出发表。RSA 这个名字正是这三位的姓氏开头字母拼在一起组成的。1982 年，这三人创建了一家名为 RSA Data Security 的公司，并于 1991 年发布 <span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvUEtDU18x">PKCS #1<i class="fa fa-external-link-alt"></i></span> 的初始版本，这也开创了后来的 <span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvUEtDUw==">PKCS<i class="fa fa-external-link-alt"></i></span> 公钥加密标准</p>
+<p>PKCS #1 定义了 RSA 的数理基础、公私钥格式标准（通过 <span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvQVNOLjE=">ASN.1<i class="fa fa-external-link-alt"></i></span> 的格式标准来定义并明文展示），以及为加密&#x2F;解密，生成和验证签名等操作等。ASN.1 是一套标准，是描述数据的表示、编码、传输、解码的灵活的记法，但是没有限定其编码的方法。标准的 ASN.1 编码规则有基本编码规则（BER，Basic Encoding Rules）、规范编码规则（CER，Canonical Encoding Rules）、唯一编码规则（DER，Distinguished Encoding Rules）、压缩编码规则（PER，Packed Encoding Rules）和XML编码规则（XER，XML Encoding Rules）。其中 BER 和 DER 是最常见的密钥文件编码规则。由于 DER 编码后的 ASN.1 数据一般是二进制数据，不方便直接作为文本传输，所以通常会在 DER 编码基础上再进行 Base64 编码，这就是经常看到的密钥文件格式 PEM。PEM 本身不是 ASN.1 的编码规则，它只是 <code>Base64-encoded DER</code>。PEM 格式还定义了一行作为头部，一行作为尾部：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-----BEGIN label -----</span><br><span class="line">-----END label-----</span><br></pre></td></tr></table></figure>
+
+<p>除了 RSA，还有很多其他非对称加密算法，如 DSA，ECC 等，而 PKCS #1 只能使用 RSA。为了兼容其他的非对称加密算法，支持各种类型的私钥，制定了 <span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvUEtDU184">PKCS #8<i class="fa fa-external-link-alt"></i></span></p>
+<h2 id="openssl"><a href="#openssl" class="headerlink" title="openssl"></a>openssl</h2><p>openssl 3 默认生成 PKCS #8 的 PEM 编码 RSA 私钥，下面命令生成的 pkcs8.pri 以 <code>-----BEGIN PRIVATE KEY-----</code> 开头</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">openssl version</span><br><span class="line">OpenSSL 3.0.2 15 Mar 2022 (Library: OpenSSL 3.0.2 15 Mar 2022)</span><br><span class="line"></span><br><span class="line">openssl genrsa -out pkcs8.pri</span><br></pre></td></tr></table></figure>
+
+<p>如果想生成 PKCS #1 的 RSA 私钥，可以加上 -traditional 参数，生成的 pkcs1.pri 以 <code>-----BEGIN RSA PRIVATE KEY-----</code> 开头</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out pkcs1.pri -traditional</span><br></pre></td></tr></table></figure>
+
+<p>从私钥开头可以看出，PKCS #1 因为只支持 RSA，所以开头行直接指明了 RSA。而 PKCS #8 中私钥算法也是私钥数据的一部分，只看开头行是看不出私钥具体使用了哪种算法。使用一些 ASN.1 解码工具，可以进行查看。比如 <span class="exturl" data-url="aHR0cHM6Ly9sYXBvLml0L2FzbjFqcy8j">ASN.1 JavaScript decoder<i class="fa fa-external-link-alt"></i></span>，复制 pkcs8.pri 内容进行 decode，可以看到解析结果有一行为 OBJECT IDENTIFIER 1.2.840.113549.1.1.1 rsaEncryption (PKCS #1)，说明使用的算法是 RSA</p>
+<p>PKCS #8 的 RSA 私钥与 PKCS #1 互转：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># PKCS #8 转为 PKCS #1</span></span><br><span class="line">openssl rsa -<span class="keyword">in</span> pkcs8.pri -out pkcs1-1.pri -traditional</span><br><span class="line"></span><br><span class="line"><span class="comment"># PKCS #1 转为 PKCS #8</span></span><br><span class="line">openssl rsa -<span class="keyword">in</span> pkcs1.pri -out pkcs8-1.pri</span><br></pre></td></tr></table></figure>
+
+<p>从私钥生成公钥以及互转：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># PKCS #8 私钥生成 PKCS #8 公钥</span></span><br><span class="line">openssl rsa -<span class="keyword">in</span> pkcs8.pri -pubout -out pkcs8.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># PKCS #1 私钥生成 PKCS #1 公钥</span></span><br><span class="line">openssl rsa -<span class="keyword">in</span> pkcs1.pri -RSAPublicKey_out -out pkcs1.pub -traditional</span><br><span class="line"></span><br><span class="line"><span class="comment"># PKCS #8 私钥生成 PKCS #1 公钥</span></span><br><span class="line">openssl rsa -<span class="keyword">in</span> pkcs1.pri -RSAPublicKey_out -out pkcs1-1.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># PKCS #1 私钥生成 PKCS #8 公钥</span></span><br><span class="line">openssl rsa -<span class="keyword">in</span> pkcs1.pri -pubout -out pkcs8-1.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># PKCS #8 公钥转为 PKCS #1 公钥</span></span><br><span class="line">openssl rsa -pubin -<span class="keyword">in</span> pkcs8.pub -RSAPublicKey_out -out pkcs1-2.pub -traditional</span><br><span class="line"></span><br><span class="line"><span class="comment"># PKCS #1 公钥转为 PKCS #8 公钥</span></span><br><span class="line">openssl rsa -pubin -<span class="keyword">in</span> pkcs1.pub -pubout -out pkcs8-2.pub -traditional</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>查看公钥可以看出，PKCS #8 公钥的开头行为 <code>-----BEGIN PUBLIC KEY-----</code>，PKCS #1 的开头行为 <code>-----BEGIN RSA PUBLIC KEY-----</code></p>
+<h2 id="ssh-keygen"><a href="#ssh-keygen" class="headerlink" title="ssh-keygen"></a>ssh-keygen</h2><p><span class="exturl" data-url="aHR0cHM6Ly9tYW4ub3BlbmJzZC5vcmcvc3NoLWtleWdlbg==">ssh-keygen<i class="fa fa-external-link-alt"></i></span> 是 OpenSSH 一个用于鉴权密钥的工具集，可以生成、管理、转换 ssh 密钥。ssh-keygen 默认生成 OpenSSH 专有格式的密钥，这种格式“提供更好的保护并且能储存对密钥的备注”</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一对没有密码的公私钥</span></span><br><span class="line">ssh-keygen -f ./id_rsa</span><br></pre></td></tr></table></figure>
+
+<p>查看私钥 id_rsa，开头行为 <code>-----BEGIN OPENSSH PRIVATE KEY-----</code>，公钥 id_rsa.pub 格式为 <code>ssh-rsa base64Content someComment</code>，都与 PKCS #1 和 PKCS #8 不同</p>
+<p>ssh-keygen 曾经也使用 PEM(其实是 PKCS #1) 格式生成私钥，现在可以通过指定 -m 参数实现：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一对没有密码的 PKCS #1 私钥和公钥</span></span><br><span class="line">ssh-keygen -m PEM -f ./id_rsa_pem</span><br></pre></td></tr></table></figure>
+
+<p>查看私钥 id_rsa_pem 开头行为 <code>-----BEGIN RSA PRIVATE KEY-----</code>，但公钥 id_rsa_pem.pub 格式还是不变。同理，指定 -m 为 PKCS8 可以生成 PKCS #8 私钥和公钥</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一对没有密码的 PKCS #1 私钥和公钥</span></span><br><span class="line">ssh-keygen -m PKCS8 -f ./id_rsa_pkcs8</span><br></pre></td></tr></table></figure>
+
+<p>根据已存在的私钥生成指定格式的公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 根据 OpenSSH 私钥生成 OpenSSH 公钥</span></span><br><span class="line">ssh-keygen -y -f id_rsa &gt; id_rsa_1.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 PKCS #1 私钥生成 OpenSSH 公钥 </span></span><br><span class="line">ssh-keygen -y -f id_rsa_pem &gt; id_rsa_2.pub</span><br><span class="line">ssh-keygen -y -f pkcs1.pri &gt; id_rsa_3.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 PKCS #8 私钥生成 OpenSSH 公钥 </span></span><br><span class="line">ssh-keygen -y -f id_rsa_pkcs8 &gt; id_rsa_4.pub</span><br><span class="line">ssh-keygen -y -f pkcs8.pri &gt; id_rsa_5.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 OpenSSH 私钥生成 PKCS #1 公钥</span></span><br><span class="line">ssh-keygen -m PEM -e -f id_rsa &gt; id_rsa_pem_1.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 PKCS #8 私钥生成 PKCS #1 公钥</span></span><br><span class="line">ssh-keygen -m PEM -e -f id_rsa_pkcs8 &gt; id_rsa_pem_2.pub</span><br><span class="line">ssh-keygen -m PEM -e -f pkcs8.pri &gt; id_rsa_pem_3.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 OpenSSH 私钥生成 PKCS #8 公钥</span></span><br><span class="line">ssh-keygen -m PKCS8 -e -f id_rsa &gt; id_rsa_pkcs8_1.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 PKCS #1 私钥生成 PKCS #8 公</span></span><br><span class="line">ssh-keygen -m PKCS8 -e -f id_rsa_pem &gt; id_rsa_pkcs8_2.pub</span><br><span class="line">ssh-keygen -m PKCS8 -e -f pkcs1.pri &gt; id_rsa_pkcs8_3.pub</span><br></pre></td></tr></table></figure>
+
+<p>将已存在的公钥转成指定格式的公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 根据 PKCS #1 公钥生成 OpenSSH 公钥</span></span><br><span class="line">ssh-keygen -f id_rsa_pkcs1_1.pub -i -m PEM &gt; id_rsa_pem_6.pub</span><br><span class="line">ssh-keygen -f pkcs1.pub -i -m PEM &gt; id_rsa_pem_7.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 PKCS #8 公钥生成 OpenSSH 公钥</span></span><br><span class="line">ssh-keygen -f id_rsa_pkcs8_1.pub -i -m PKCS8 &gt; id_rsa_8.pub</span><br><span class="line">ssh-keygen -f pkcs8.pub -i -m PKCS8 &gt; id_rsa_9.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 OpenSSH 公钥生成 PKCS #1 公钥</span></span><br><span class="line">ssh-keygen -f id_rsa.pub -e -m PEM &gt; id_rsa_pem_4.pub</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 OpenSSH 公钥生成 PKCS #8 公钥</span></span><br><span class="line">ssh-keygen -f id_rsa.pub -e -m PKCS8 &gt; id_rsa_pkcs8_4.pub</span><br></pre></td></tr></table></figure>
+
+<p>将已存在的私钥转成指定格式的私钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 根据 PKCS #1 私钥生成 OpenSSH 私钥，只能通过修改密码的方式原地转换</span></span><br><span class="line"><span class="built_in">cp</span> id_rsa_pem id_rsa_pem.bak</span><br><span class="line">ssh-keygen -p -f id_rsa_pem</span><br><span class="line"><span class="built_in">mv</span> id_rsa_pem id_rsa_1</span><br><span class="line"><span class="built_in">cp</span> id_rsa_pem.bak id_rsa_pem</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 PKCS #8 私钥生成 OpenSSH 私钥，同上</span></span><br><span class="line"><span class="built_in">cp</span> id_rsa_pkcs8 id_rsa_pkcs8.bak</span><br><span class="line">ssh-keygen -p -f id_rsa_pkcs8</span><br><span class="line"><span class="built_in">mv</span> id_rsa_pkcs8 id_rsa_2</span><br><span class="line"><span class="built_in">cp</span> id_rsa_pkcs8.bak id_rsa_pkcs8</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 OpenSSH 私钥生成 PKCS #1 私钥，同上</span></span><br><span class="line"><span class="built_in">cp</span> id_rsa id_rsa.bak</span><br><span class="line">ssh-keygen -p -m PEM -f id_rsa</span><br><span class="line"><span class="built_in">mv</span> id_rsa id_rsa_pem_1</span><br><span class="line"><span class="built_in">cp</span> id_rsa.bak id_rsa</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据 OpenSSH 私钥生成 PKCS #8 私钥，同上</span></span><br><span class="line">ssh-keygen -p -m PKCS8 -f id_rsa</span><br><span class="line"><span class="built_in">mv</span> id_rsa id_rsa_pkcs8_1</span><br><span class="line"><span class="built_in">cp</span> id_rsa.bak id_rsa</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+      
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RSA/" rel="tag"><i class="fa fa-tag"></i> RSA</a>
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wpac-rating-container">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/10/06/midway-vue-vite-ssr/" rel="prev" title="Midway + Vue3 + Vite 的全栈 SSR demo 工程">
+                  <i class="fa fa-chevron-left"></i> Midway + Vue3 + Vite 的全栈 SSR demo 工程
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">142k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:56</span>
+  </span>
+</div>
+  <div class="powered-by">由 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZw==">NexT.Gemini</span> 强力驱动
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fbbf7fa3f0647a9" async="async"></script>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+  <script src="https://embed.widgetpack.com/widget.js" async></script>
+  <script class="next-config" data-name="rating" type="application/json">{"enable":true,"id":28335,"color":"#fc6423"}</script>
+  <script src="/js/third-party/rating.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"ignores":null,"url":"https://ilyydy.github.io/2022/10/07/rsa-openssl-openssh/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ilyydy","repo":"gh-blog-comments","client_id":"18fd95f6a6685538c865","client_secret":"fef5d78bb1ab27beb655cb6134a4ee70124d9839","admin_user":"ilyydy","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"1489a4855bbbe05f90567e8addc9f853"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
